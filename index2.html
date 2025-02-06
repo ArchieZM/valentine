@@ -2,201 +2,265 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Валентинка для Киры</title>
+ <title>Валентинка</title>
  <style>
- body {
+ /* Общие стили */
+ * {
+ box-sizing: border-box;
  margin:0;
  padding:0;
- background: #1a1a1a;
- color: #ff99cc;
- font-family: 'Arial', sans-serif;
- display: flex;
- justify-content: center;
- align-items: center;
- min-height:100vh;
- overflow: hidden;
  }
-
- #container {
+ html, body {
+ height:100%;
+ overflow: hidden;
+ font-family: 'Arial', sans-serif;
+ background: #000;
+ }
+ #app {
  position: relative;
  width:100%;
- max-width:600px;
- padding:20px;
- }
-
- #message {
+ height:100%;
  text-align: center;
- font-size:2em;
- margin-bottom:20px;
- color: #ff99cc;
+ color: #fff;
+ user-select: none;
+ cursor: pointer;
+ overflow: hidden;
+ transition: transform1.5s ease-in-out;
+ z-index:1;
  }
-
- #continue-btn {
- display: block;
- margin:20px auto;
+ #initialBg {
+ position: absolute;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ background: url("https://xmple.com/wallpaper/gradient-purple-linear-black-2880x5120-c2-ff00ff-000000-a-90-f-14.svg") no-repeat center center;
+ background-size: cover;
+ z-index: -1;
+ transition: transform1.5s ease-in-out;
+ }
+ #mainText {
+ position: absolute;
+ top:38%;
+ width:100%;
+ font-size:60px;
+ font-weight:900;
+ z-index:2;
+ text-shadow:4px4px8px #000;
+ opacity:1;
+ transition: transform1.5s ease-in-out, opacity1.5s ease-in-out;
+ animation: pulseText2s infinite alternate;
+ }
+ @keyframes pulseText {
+ from { text-shadow:4px4px8px #000; }
+ to { text-shadow:8px8px16px #ff00ff; }
+ }
+ #hint {
+ position: absolute;
+ top:50%;
+ width:100%;
+ font-size:14px;
+ font-weight: normal;
+ opacity:0.1;
+ z-index:2;
+ transition: transform1.5s ease-in-out, opacity1.5s ease-in-out;
+ }
+ #restartBtn {
+ position: absolute;
+ bottom:20px;
+ left:50%;
+ transform: translateX(-50%);
  padding:10px20px;
- background-color: #4dc3ff;
+ font-size:18px;
+ background-color: #28a745;
  border: none;
  border-radius:5px;
- color: #fff;
- font-size:1.2em;
  cursor: pointer;
- transition: transform0.3s ease;
+ z-index:10;
+ display: none;
  }
-
- #continue-btn:hover {
- background-color: #1aa3ff;
- }
-
- #heart-canvas {
- width:100%;
- height:400px;
- }
-
- .background {
- position: fixed;
- top:0;
- left:0;
- width:100%;
- height:100%;
- background: linear-gradient(45deg, #ff99cc, #ff0066);
- animation: gradientFlow5s ease infinite;
- opacity:0.1;
- z-index: -1;
- }
-
- @keyframes gradientFlow {
-0% { background-position:0%50%; }
-50% { background-position:100%50%; }
-100% { background-position:0%50%; }
- }
-
- .thread {
+ #neonHeart {
  position: absolute;
- width:2px;
- height:50px;
- background: #ff99cc;
- transform-origin: bottom center;
- animation: threadFlow1s ease-out forwards;
- opacity:0.5;
- }
-
- @keyframes threadFlow {
-0% { transform: translateY(0) scaleY(1); opacity:0.5; }
-100% { transform: translateY(-100px) scaleY(0); opacity:0; }
- }
-
- .overlay {
- position: fixed;
- top:0;
- left:0;
- width:100%;
- height:100%;
- background: rgba(0,0,0,0);
- animation: overlayFade2s ease-out forwards;
- z-index:1000;
- }
-
- @keyframes overlayFade {
-0% { background: rgba(0,0,0,0); }
-100% { background: rgba(0,0,0,1); }
- }
-
- .heart {
- position: absolute;
- width:100px;
- height:100px;
- background: #ff99cc;
- animation: heartPulse1s ease-in-out infinite;
+ top:50%;
+ left:50%;
  transform: translate(-50%, -50%);
+ z-index:4;
+ display: none;
  }
-
- @keyframes heartPulse {
+ #pulsingHeart {
+ position: absolute;
+ top:50%;
+ left:50%;
+ transform: translate(-50%, -50%);
+ width:150px;
+ height:150px;
+ background: radial-gradient(circle, #ff69b440%, transparent70%);
+ border-radius:50%;
+ box-shadow:0020px rgba(255,105,180,0.8);
+ z-index:5;
+ display: none;
+ animation: pulse1.5s infinite;
+ }
+ @keyframes pulse {
 0% { transform: translate(-50%, -50%) scale(1); }
-50% { transform: translate(-50%, -50%) scale(1.2); }
+50% { transform: translate(-50%, -50%) scale(1.1); }
 100% { transform: translate(-50%, -50%) scale(1); }
+ }
+ #particleCanvas {
+ position: absolute;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ z-index:6;
+ pointer-events: none;
  }
  </style>
 </head>
 <body>
- <div class="background"></div>
- <div id="container">
- <div id="message">Я люблю тебя♥️</div>
- <canvas id="heart-canvas"></canvas>
- <button id="continue-btn">Продолжить</button>
+ <div id="app">
+ <div id="initialBg"></div>
+ <div id="mainText">Люблю тебя♥️</div>
+ <div id="hint">нажми</div>
+ <div id="neonHeart">
+ <svg viewBox="00200200" width="200" height="200">
+ <path id="heartPath" d="M100,30 C70,5050,8050,120 A50,5000,0150,120 C150,80130,50100,30 Z"
+ fill="none"
+ stroke="#ff69b4"
+ stroke-width="4"
+ stroke-linecap="round"
+ stroke-dasharray="628"
+ stroke-dashoffset="628">
+ <animate attributeName="stroke-dashoffset"
+ from="628" to="0"
+ dur="2s"
+ fill="freeze" />
+ <animate attributeName="stroke-dasharray"
+ from="0628" to="6280"
+ dur="2s"
+ fill="freeze" />
+ </path>
+ </svg>
+ <style>
+ #heartPath {
+ filter: drop-shadow(0010px #ff69b4) drop-shadow(0020px #ff69b4) drop-shadow(0030px #ff69b4);
+ }
+ </style>
+ </div>
+ <div id="pulsingHeart"></div>
+ <canvas id="particleCanvas"></canvas>
+ <button id="restartBtn">Начать сначала</button>
  </div>
 
  <script>
- const canvas = document.getElementById('heart-canvas');
- const ctx = canvas.getContext('2d');
- const messageElement = document.getElementById('message');
- const continueButton = document.getElementById('continue-btn');
- const container = document.getElementById('container');
+ const app = document.getElementById('app');
+ const initialBg = document.getElementById('initialBg');
+ const mainText = document.getElementById('mainText');
+ const hint = document.getElementById('hint');
+ const neonHeart = document.getElementById('neonHeart');
+ const pulsingHeart = document.getElementById('pulsingHeart');
+ const restartBtn = document.getElementById('restartBtn');
+ const particleCanvas = document.getElementById('particleCanvas');
+ const pctx = particleCanvas.getContext('2d');
 
- canvas.width = window.innerWidth;
- canvas.height = window.innerHeight *0.6;
+ let canvasWidth = window.innerWidth;
+ let canvasHeight = window.innerHeight;
+ particleCanvas.width = canvasWidth;
+ particleCanvas.height = canvasHeight;
 
- let animationStarted = false;
+ let stage =1;
+ console.log("Начальный этап: stage =", stage);
 
- continueButton.addEventListener('click', startAnimation);
-
- function startAnimation() {
- if (animationStarted) return;
- animationStarted = true;
-
- // Убрать кнопку continueButton.style.opacity = '0';
- continueButton.style.transform = 'translateY(-100px)';
- continueButton.style.transition = 'opacity0.5s ease, transform0.5s ease';
-
- // Анимация фона document.querySelector('.background').style.animation = 'gradientFlowFast2s ease infinite';
- document.querySelector('.background').style.opacity = '0.3';
-
- // Создать сердца createHearts();
-
- // Появить нити createThreads();
-
- // Появить черный фон setTimeout(() => {
- const overlay = document.createElement('div');
- overlay.className = 'overlay';
- document.body.appendChild(overlay);
-
- // Создать пульсирующее сердце setTimeout(() => {
- const heart = document.createElement('div');
- heart.className = 'heart';
- heart.style.left = '50%';
- heart.style.top = '50%';
- document.body.appendChild(heart);
- },2000);
- },1500);
- }
-
- function createHearts() {
- for (let i =0; i <10; i++) {
- const heart = document.createElement('div');
- heart.className = 'heart';
- heart.style.left = Math.random() *100 + '%';
- heart.style.top = Math.random() *100 + '%';
- document.body.appendChild(heart);
- }
- }
-
- function createThreads() {
- const corners = [
- { x:0, y:0 },
- { x:100, y:0 },
- { x:100, y:100 },
- { x:0, y:100 }
+ const kiraAttributes = [
+ "Любимая", "Моя звезда", "Нежная", "Очаровательная", "Уникальная",
+ "Мечта", "Свет", "Вдохновение", "Счастье", "Радость"
  ];
 
- corners.forEach((corner, index) => {
- const thread = document.createElement('div');
- thread.className = 'thread';
- thread.style.left = corner.x + 'vw';
- thread.style.top = corner.y + 'vh';
- thread.style.animationDelay = index *0.2 + 's';
- document.body.appendChild(thread);
- });
+ function animate() {
+ requestAnimationFrame(animate);
+ if (stage ===5) {
+ pctx.fillStyle = 'rgba(0,0,0,0.05)';
+ pctx.fillRect(0,0, canvasWidth, canvasHeight);
  }
+ }
+
+ app.addEventListener('click', (e) => {
+ if (stage ===1) {
+ stage =2;
+ console.log("Переход на этап2");
+ app.style.transform = "translateY(-50%)";
+ mainText.style.transform = "translateY(-50%)";
+ hint.style.transform = "translateY(-50%)";
+ mainText.style.animation = "none";
+ setTimeout(() => {
+ stage =3;
+ console.log("Переход на этап3");
+ neonHeart.style.display = "block";
+ pulsingHeart.style.display = "block";
+ },1500);
+ } else if (stage ===3) {
+ const randomEffect = Math.random();
+ if (randomEffect <0.5) {
+ heartEffect();
+ } else {
+ kiraEffect();
+ }
+ stage =4;
+ } else if (stage ===4 && e.target === restartBtn) {
+ stage =1;
+ app.style.transform = "";
+ mainText.style.transform = "";
+ hint.style.transform = "";
+ mainText.style.animation = "pulseText2s infinite alternate";
+ neonHeart.style.display = "none";
+ pulsingHeart.style.display = "none";
+ particleCanvas.getContext('2d').clearRect(0,0, canvasWidth, canvasHeight);
+ console.log("Перезагрузка");
+ }
+ });
+
+ function heartEffect() {
+ pulsingHeart.style.opacity = "1";
+ animateHeart();
+ }
+
+ function kiraEffect() {
+ const randomAttribute = kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)];
+ mainText.textContent = randomAttribute;
+ mainText.style.opacity = "0";
+ setTimeout(() => {
+ mainText.style.opacity = "1";
+ mainText.style.transform = "translateY(-50%)";
+ },500);
+ }
+
+ function animateHeart() {
+ pulsingHeart.style.transform = "translate(-50%, -50%) scale(1.1)";
+ setTimeout(() => {
+ pulsingHeart.style.transform = "translate(-50%, -50%) scale(1)";
+ animateHeart();
+ },1000);
+ }
+
+ function init() {
+ particleCanvas.width = window.innerWidth;
+ particleCanvas.height = window.innerHeight;
+ pctx.fillStyle = "rgba(0,0,0,0.1)";
+ pctx.fillRect(0,0, canvasWidth, canvasHeight);
+ console.log("Инициализация завершена");
+ }
+
+ animate();
+ init();
+
+ window.addEventListener('resize', () => {
+ canvasWidth = window.innerWidth;
+ canvasHeight = window.innerHeight;
+ particleCanvas.width = canvasWidth;
+ particleCanvas.height = canvasHeight;
+ pctx.fillStyle = "rgba(0,0,0,0.1)";
+ pctx.fillRect(0,0, canvasWidth, canvasHeight);
+ });
  </script>
 </body>
 </html>

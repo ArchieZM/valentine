@@ -1,226 +1,334 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
- <style>
- * {
- margin:0;
- padding:0;
- box-sizing: border-box;
- }
-
- body {
- background: #000;
- min-height:100vh;
- display: flex;
- justify-content: center;
- align-items: center;
- font-family: Arial, sans-serif;
- }
-
- #app {
- position: relative;
- width:100%;
- height:100%;
- transition: transform1s;
- }
-
- #initialBg {
- position: absolute;
- top:0;
- left:0;
- width:100%;
- height:100%;
- background: #000;
- z-index: -1;
- }
-
- #mainText {
- position: relative;
- color: #fff;
- font-size:2em;
- text-align: center;
- padding:20px;
- animation: pulseText2s infinite;
- }
-
- #hint {
- position: absolute;
- top:50%;
- left:50%;
- transform: translate(-50%, -50%);
- color: #fff;
- font-size:1.2em;
- text-align: center;
- opacity:0.3;
- }
-
- .word-container {
- position: absolute;
- color: #fff;
- font-size:1.5em;
- opacity:0;
- animation: fadeInOut2s infinite;
- }
-
- .heart {
- position: absolute;
- font-size:1em;
- color: #ff0066;
- opacity:0;
- animation: fadeInOut2s infinite;
- }
-
- #neonHeart {
- position: absolute;
- width:100px;
- height:100px;
- }
-
- #pulsingHeart {
- position: absolute;
- width:50px;
- height:50px;
- display: none;
- animation: pulse1s infinite;
- }
-
- #particleCanvas {
- position: absolute;
- }
-
- #restartBtn {
- display: none;
- position: absolute;
- padding:10px20px;
- background: #fff;
- color: #000;
- border: none;
- border-radius:5px;
- cursor: pointer;
- }
-
- @keyframes pulseText {
-0%,100% { text-shadow:0010px #fff; }
-50% { text-shadow:0020px #fff,0030px #fff; }
- }
-
- @keyframes pulse {
-0%,100% { transform: scale(1); opacity:1; }
-50% { transform: scale(1.1); opacity:0.8; }
- }
-
- @keyframes fadeInOut {
-0%,100% { opacity:0; transform: translateY(20px); }
-50% { opacity:1; transform: translateY(0); }
- }
- </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Валентинка</title>
+  <style>
+    /* Общие стили */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      /* Фон body – чёрный, чтобы после анимации был чёрный фон */
+      background: #000;
+    }
+    /* Контейнер приложения, который будет анимироваться */
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      color: #fff;
+      user-select: none;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 1.5s ease-in-out;
+      z-index: 1;
+    }
+    /* Начальный фон – указанная SVG-картинка */
+    #initialBg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("https://xmple.com/wallpaper/gradient-purple-linear-black-2880x5120-c2-ff00ff-000000-a-90-f-14.svg") no-repeat center center;
+      background-size: cover;
+      z-index: -1;
+      transition: transform 1.5s ease-in-out;
+    }
+    /* Основной текст (например, "Люблю тебя♥️") – оставляем как есть */
+    #mainText {
+      position: absolute;
+      top: 38%;
+      width: 100%;
+      font-size: 60px;
+      font-weight: 900;
+      z-index: 2;
+      text-shadow: 4px 4px 8px #000;
+      opacity: 1;
+      transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
+      animation: pulseText 2s infinite alternate;
+    }
+    @keyframes pulseText {
+      from { text-shadow: 4px 4px 8px #000; }
+      to { text-shadow: 8px 8px 16px #ff00ff; }
+    }
+    /* Подсказка "нажми" – почти незаметная */
+    #hint {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      font-size: 14px;
+      font-weight: normal;
+      opacity: 0.1;
+      z-index: 2;
+      transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
+    }
+    /* Кнопка перезапуска */
+    #restartBtn {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 10;
+      display: none;
+    }
+    /* Стили для SVG неонового сердца (Этап появления) */
+    #neonHeart {
+      position: absolute;
+      /* Изменили положение: теперь ниже центра (например, 65% от верха) */
+      top: 65%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      display: none;
+    }
+    /* Стили для пульсирующего сердца внутри контура (Этап 4) */
+    #pulsingHeart {
+      position: absolute;
+      top: 65%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, #ff69b4 40%, transparent 70%);
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(255,105,180,0.8);
+      z-index: 5;
+      display: none;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    /* Canvas для эффекта частиц (Этап 5) */
+    #particleCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 6;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
- <div id="app">
- <div id="initialBg"></div>
- <div id="mainText">Кликни на меня!</div>
- <div id="hint">Кликай на меня!</div>
- <div id="neonHeart">
- <svg width="100%" height="100%">
- <path d="M1010 L7090 L13010" fill="#ff0066"/>
- </svg>
- </div>
- <div id="pulsingHeart">
- <svg width="100%" height="100%">
- <path d="M1010 L7090 L13010" fill="#ff0066"/>
- </svg>
- </div>
- <canvas id="particleCanvas"></canvas>
- <button id="restartBtn">Restart</button>
- </div>
+  <div id="app">
+    <!-- Начальный фон -->
+    <div id="initialBg"></div>
 
- <script>
- let stage =1;
- const words = ["любимая", "сладкая", "милая", "дорогая"];
+    <!-- Основной текст -->
+    <div id="mainText">Люблю тебя♥️</div>
+    <!-- Подсказка (почти незаметная) -->
+    <div id="hint">нажми</div>
 
- document.getElementById('app').addEventListener('click', function() {
- if (stage ===1) {
- stage =2;
- document.getElementById('initialBg').style.display = 'none';
- document.getElementById('mainText').style.transform = 'translateY(-50px)';
- document.getElementById('hint').style.opacity = '0.5';
- setTimeout(() => {
- stage =3;
- document.getElementById('neonHeart').style.display = 'none';
- document.getElementById('pulsingHeart').style.display = 'block';
- document.getElementById('restartBtn').style.display = 'block';
- addRandomWords();
- },1500);
- } else if (stage ===3) {
- const random = Math.random();
- if (random <0.5) {
- heartEffect();
- } else {
- kiraEffect();
- }
- stage =4;
- }
- });
+    <!-- SVG неонового сердца (Этап 3) -->
+    <div id="neonHeart">
+      <svg viewBox="0 0 200 200" width="200" height="200">
+        <path id="heartPath" d="M100,30 C70,50 50,80 50,120 A50,50 0 0,0 150,120 C150,80 130,50 100,30 Z"
+              fill="none"
+              stroke="#ff69b4"
+              stroke-width="4"
+              stroke-linecap="round"
+              stroke-dasharray="628"
+              stroke-dashoffset="628">
+          <animate attributeName="stroke-dashoffset"
+                   from="628" to="0"
+                   dur="2s"
+                   fill="freeze" />
+          <animate attributeName="stroke-dasharray"
+                   from="0 628" to="628 0"
+                   dur="2s"
+                   fill="freeze" />
+        </path>
+      </svg>
+      <style>
+        #heartPath {
+          filter: drop-shadow(0 0 10px #ff69b4) drop-shadow(0 0 20px #ff69b4) drop-shadow(0 0 30px #ff69b4);
+        }
+      </style>
+    </div>
 
- function addRandomWords() {
- words.forEach(word => {
- const wordElement = document.createElement('div');
- wordElement.className = 'word-container';
- wordElement.textContent = word;
+    <!-- Пульсирующее сердце внутри неонового контура (Этап 4) -->
+    <div id="pulsingHeart"></div>
 
- const heart = document.createElement('div');
- heart.className = 'heart';
- heart.textContent = '❤';
+    <!-- Canvas для эффекта частиц (Этап 5) -->
+    <canvas id="particleCanvas"></canvas>
 
- document.getElementById('app').appendChild(wordElement);
- document.getElementById('app').appendChild(heart);
+    <!-- Кнопка перезапуска -->
+    <button id="restartBtn">Начать сначала</button>
+  </div>
 
- // Позиционирование слов и сердечек const x = Math.random() *100;
- const y = Math.random() *100;
- wordElement.style.left = `${x}%`;
- wordElement.style.top = `${y}%`;
- heart.style.left = `${x}%`;
- heart.style.top = `${y}%`;
- });
- }
+  <script>
+    /* ===== Настройки и переменные ===== */
+    const app = document.getElementById('app');
+    const initialBg = document.getElementById('initialBg');
+    const mainText = document.getElementById('mainText');
+    const hint = document.getElementById('hint');
+    const neonHeart = document.getElementById('neonHeart');
+    const pulsingHeart = document.getElementById('pulsingHeart');
+    const restartBtn = document.getElementById('restartBtn');
+    const particleCanvas = document.getElementById('particleCanvas');
+    const pctx = particleCanvas.getContext('2d');
 
- function heartEffect() {
- document.getElementById('pulsingHeart').style.opacity = "1";
- animateHeart();
- }
+    let canvasWidth = window.innerWidth;
+    let canvasHeight = window.innerHeight;
+    particleCanvas.width = canvasWidth;
+    particleCanvas.height = canvasHeight;
 
- function kiraEffect() {
- const kiraAttributes = [
- "color: #ff0000",
- "color: #00ff00",
- "color: #0000ff",
- "color: #ffff00",
- "color: #ff00ff"
- ];
- let index =0;
- const element = document.getElementById('mainText');
- const changeColor = () => {
- element.style.color = kiraAttributes[index];
- index = (index +1) % kiraAttributes.length;
- };
- const interval = setInterval(changeColor,100);
- setTimeout(() => {
- clearInterval(interval);
- element.style.color = "#fff";
- },1000);
- }
+    // Этапы:
+    // stage = 1 – начальный экран (фон, текст, подсказка, плавающие элементы)
+    // stage = 2 – анимация подъёма (фон, текст и подсказка уходят вверх, открывая черный фон)
+    // stage = 3 – сразу после подъёма (фон чёрный) появляется неоновое сердце и пульсирующее сердце;
+    //           последующие клики запускают эффект частиц.
+    let stage = 1;
+    console.log("Начальный этап: stage =", stage);
 
- function animateHeart() {
- const heart = document.getElementById('pulsingHeart');
- let size =1;
- const grow = () => {
- size +=0.1;
- heart.style.transform = `scale(${size})`;
- if (size <1.5) {
- setTimeout(grow,100);
- }
- };
- grow();
- }
- </script>
+    /* ===== Список характеристик для Киры ===== */
+    const kiraAttributes = [
+      "Любимая", "Моя звезда", "Нежная", "Очаровательная", "Уникальная",
+      "Мечта", "Свет моей жизни", "Драгоценность", "Радость", "Сердце"
+    ];
+
+    /* ===== Плавающие элементы (характеристики) ===== */
+    // Массив для плавающих элементов
+    const floatingItems = [];
+    // Функция создания случайного плавающего элемента.
+    // Каждый элемент состоит из текста из списка характеристик, иногда с добавлением маленького сердца.
+    function spawnFloatingItem() {
+      let text = kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)];
+      // С вероятностью 50% добавляем маленький символ сердца (отделён пробелом)
+      if (Math.random() < 0.5) {
+        text += " ♥";
+      }
+      floatingItems.push({
+        text: text,
+        x: Math.random() * canvasWidth,
+        y: canvasHeight + Math.random() * 50,
+        speed: 0.7 + Math.random(), // немного быстрее
+        opacity: 0,
+        life: 0,
+        maxLife: 200 + Math.random() * 150,
+        fontSize: 28 + Math.random() * 10  // заметный шрифт
+      });
+    }
+    // Запускаем спаун каждые 400 мс
+    setInterval(spawnFloatingItem, 400);
+    // Для отрисовки плавающих элементов можно использовать дополнительный canvas,
+    // но здесь для простоты выведем их прямо через создание элементов или оставим их логику для расширения.
+
+    /* ===== Переход: при клике на экран весь контейнер поднимается вверх ===== */
+    app.addEventListener('click', (event) => {
+      if (stage === 1) {
+        console.log("Клик на этапе 1. Запуск анимации подъёма...");
+        // Анимация подъёма: смещаем весь контейнер вверх на высоту экрана
+        app.style.transform = `translateY(-${canvasHeight}px)`;
+        initialBg.style.transform = `translateY(-${canvasHeight}px)`;
+        // После окончания анимации (1.5 сек) фон становится чёрным – сразу отображаем неоновое сердце
+        setTimeout(() => {
+          stage = 2;
+          console.log("Этап 2: фон теперь чёрный. Отображаем неоновое сердце...");
+          neonHeart.style.display = 'block';
+          // В этот же момент можно сразу отобразить пульсирующее сердце, без задержки
+          pulsingHeart.style.display = 'block';
+          stage = 3;
+          console.log("Этап 3: неоновое и пульсирующее сердце отображены. Теперь клики запускают эффект частиц.");
+        }, 1500);
+      } else if (stage === 3) {
+        createParticleExplosion(event.clientX, event.clientY);
+      }
+    });
+
+    /* ===== Эффект частиц (Этап 3/4) ===== */
+    const particles = [];
+    function createParticleExplosion(x, y) {
+      const count = 20 + Math.floor(Math.random() * 20);
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3 + 1;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 60 + Math.random() * 30,
+          // Используем характеристики Киры для эффекта частиц
+          word: kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)],
+          fontSize: 14 + Math.random() * 12,
+          opacity: 1,
+          isHeart: Math.random() < 0.5
+        });
+      }
+    }
+    function updateParticles() {
+      pctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        p.opacity = p.life / 90;
+        if (p.isHeart) {
+          pctx.save();
+          pctx.translate(p.x, p.y);
+          pctx.scale(0.03 * p.fontSize, 0.03 * p.fontSize);
+          pctx.beginPath();
+          pctx.moveTo(0, -30);
+          pctx.bezierCurveTo(30, -70, 70, -20, 0, 30);
+          pctx.bezierCurveTo(-70, -20, -30, -70, 0, -30);
+          pctx.fillStyle = `rgba(255,105,180,${p.opacity})`;
+          pctx.fill();
+          pctx.restore();
+        } else {
+          pctx.font = `${p.fontSize}px Arial`;
+          pctx.fillStyle = `rgba(255,255,255,${p.opacity})`;
+          pctx.fillText(p.word, p.x, p.y);
+        }
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+    function animate() {
+      updateParticles();
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ===== Обработка кнопки перезапуска ===== */
+    restartBtn.addEventListener('click', () => {
+      stage = 1;
+      app.style.transform = 'translateY(0)';
+      initialBg.style.transform = 'translateY(0)';
+      neonHeart.style.display = 'none';
+      pulsingHeart.style.display = 'none';
+      restartBtn.style.display = 'none';
+      particles.length = 0;
+      pctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      console.log("Перезапуск: возвращаемся к этапу 1");
+    });
+    // Показываем кнопку перезапуска через 5 секунд после появления пульсирующего сердца
+    setTimeout(() => {
+      if (stage === 3) {
+        restartBtn.style.display = 'block';
+      }
+    }, 5000);
+  </script>
 </body>
 </html>

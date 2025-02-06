@@ -2,260 +2,193 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Валентинка</title>
   <style>
+    /* Сброс отступов и настройка базовых стилей */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      /* Фон: градиент от светло-розового (в углу) к чёрному */
-      background: linear-gradient(135deg, #ffc0cb, #000);
-      font-family: Arial, sans-serif;
-      color: #fff;
+      background: linear-gradient(to bottom right, #ffccff, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+      color: white;
     }
-    #canvas {
+    /* Общие стили для этапов */
+    #stage1, #stage2, #stage3, #stage4 {
       position: absolute;
-      top: 0;
-      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
     }
-    /* Кнопка "Продолжить" */
-    #continueBtn, #restartBtn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 15px 30px;
+    /* Отображаем активный этап */
+    .active {
+      display: flex;
+    }
+    .continue-btn, .restart-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
       font-size: 18px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-    #continueBtn {
-      bottom: 20%;
+    .continue-btn {
       background-color: #00aaff;
-      color: #fff;
     }
-    /* Кнопка для перезапуска валентинки */
-    #restartBtn {
-      bottom: 10%;
-      background-color: #28a745;
-      color: #fff;
-      display: none;
+    .restart-btn {
+      background-color: #ff6699;
     }
-    /* Текст на начальном экране */
-    #message {
+    /* Анимация пульсации сердца */
+    @keyframes beat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.1); }
+      50% { transform: scale(1); }
+      75% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    /* Элемент сердца на этапе 4 */
+    #heart {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle at 50% 50%, #ff99cc, #cc66ff);
+      /* Простейшая векторная форма сердца (clip-path можно заменить SVG или другим решением) */
+      clip-path: path("M 10,30 A 20,20 0,0,1,50,30 Q 50,60 30,80 Q 10,60 10,30 z");
+      animation: beat 1s infinite;
+    }
+    /* Canvas на всю страницу (для анимации формирования сердца) */
+    #canvas {
       position: absolute;
-      top: 40%;
-      width: 100%;
-      text-align: center;
-      font-size: 36px;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px #000;
+      top: 0;
+      left: 0;
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <div id="message">Я люблю тебя♥️</div>
-  <button id="continueBtn">Продолжить</button>
-  <button id="restartBtn">Начать сначала</button>
+  <!-- Этап 1: Начальный экран -->
+  <div id="stage1" class="active">
+    <h1>Я люблю тебя ♥️</h1>
+    <button id="continueBtn" class="continue-btn">Продолжить</button>
+  </div>
+  
+  <!-- Этап 2: Переход (симуляция затемнения) -->
+  <div id="stage2">
+    <!-- Здесь можно добавить дополнительные эффекты при переходе -->
+  </div>
+  
+  <!-- Этап 3: Формирование сердца (анимация на canvas) -->
+  <div id="stage3">
+    <canvas id="canvas"></canvas>
+  </div>
+  
+  <!-- Этап 4: Биение сердца -->
+  <div id="stage4">
+    <div id="heart"></div>
+    <button id="restartBtn" class="restart-btn">Начать сначала</button>
+  </div>
 
   <script>
+    // Настройка canvas
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const messageEl = document.getElementById('message');
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Элементы этапов
+    const stage1 = document.getElementById('stage1');
+    const stage2 = document.getElementById('stage2');
+    const stage3 = document.getElementById('stage3');
+    const stage4 = document.getElementById('stage4');
     const continueBtn = document.getElementById('continueBtn');
     const restartBtn = document.getElementById('restartBtn');
-    let width, height;
-    let animationStep = 1;  // этапы анимации: 1 – начальный, 2 – переход, 3 – формирование сердца, 4 – биение сердца
-    let startTime;
-    let heartScale = 1;
-    let pulsing = false;
 
-    function resize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    // Элементы для анимации этапа 1
-    const hearts = [];
-    const words = ['Любовь', 'Счастье', 'Ты — моя звезда'];
-    for (let i = 0; i < 20; i++) {
-      hearts.push({
-        x: Math.random() * width,
-        y: height + Math.random() * 100,
-        size: Math.random() * 10 + 5,
-        speed: Math.random() * 0.5 + 0.5
-      });
-    }
-
-    function drawStage1() {
-      // Фон с градиентом
-      let gradient = ctx.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, '#ffc0cb');
-      gradient.addColorStop(1, '#000');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-
-      // Рисуем плавающие сердечки
-      hearts.forEach(heart => {
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.beginPath();
-        ctx.arc(heart.x, heart.y, heart.size, 0, Math.PI * 2);
-        ctx.fill();
-        heart.y -= heart.speed;
-        if (heart.y < -heart.size) {
-          heart.y = height + heart.size;
-        }
-      });
-
-      // Рисуем романтические слова (случайные позиции)
-      ctx.font = "24px Arial";
-      ctx.fillStyle = "rgba(255,255,255,0.3)";
-      words.forEach((word, index) => {
-        let x = Math.random() * width;
-        let y = (height / 2) + index * 30 - 30;
-        ctx.fillText(word, x, y);
-      });
-    }
-
-    // Этап 2: переход – кнопка улетает, фон смещается вверх и затем экран становится чёрным
-    let transitionStart;
-    function drawStage2() {
-      const elapsed = Date.now() - transitionStart;
-      const offset = elapsed / 2;
-      ctx.save();
-      ctx.translate(0, -offset);
-      drawStage1();
-      ctx.restore();
-
-      if (elapsed > 500) {
-        ctx.fillStyle = "rgba(0,0,0," + Math.min((elapsed - 500) / 500, 1) + ")";
-        ctx.fillRect(0, 0, width, height);
-      }
-    }
-
-    // Этап 3: формирование сердца – из углов и сторон экрана появляются неоновые нити
-    let neonLines = [];
-    let heartFormed = false;
-    function initNeonLines() {
-      neonLines = [];
-      for (let i = 0; i < 50; i++) {
-        let angle = Math.random() * Math.PI * 2;
-        neonLines.push({
-          x: Math.cos(angle) * width,
-          y: Math.sin(angle) * height,
-          angle: angle,
-          progress: 0
-        });
-      }
-    }
-    function drawStage3() {
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, width, height);
-      neonLines.forEach(line => {
-        line.progress += 0.02;
-        let startX = line.x;
-        let startY = line.y;
-        let endX = width / 2;
-        let endY = height / 2;
-        let currentX = startX + (endX - startX) * line.progress;
-        let currentY = startY + (endY - startY) * line.progress;
-        ctx.strokeStyle = 'rgba(255,20,147,' + Math.min(line.progress, 1) + ')';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(currentX, currentY);
-        ctx.stroke();
-      });
-      if (neonLines.every(line => line.progress >= 1)) {
-        heartFormed = true;
-      }
-    }
-
-    // Этап 4: сердце начинает биться (пульсация)
-    function drawHeart() {
-      ctx.save();
-      ctx.translate(width / 2, height / 2);
-      ctx.scale(heartScale, heartScale);
-      ctx.beginPath();
-      // Рисуем форму сердца с помощью кривых Безье
-      ctx.moveTo(0, -50);
-      ctx.bezierCurveTo(50, -100, 100, -25, 0, 100);
-      ctx.bezierCurveTo(-100, -25, -50, -100, 0, -50);
-      ctx.fillStyle = 'rgb(255,105,180)';
-      ctx.fill();
-      ctx.restore();
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, width, height);
-      if (animationStep === 1) {
-        drawStage1();
-      } else if (animationStep === 2) {
-        drawStage2();
-        if (Date.now() - transitionStart > 1000) {
-          animationStep = 3;
-          initNeonLines();
-        }
-      } else if (animationStep === 3) {
-        drawStage3();
-        if (heartFormed) {
-          animationStep = 4;
-          pulsing = true;
-          startTime = Date.now();
-        }
-      } else if (animationStep === 4) {
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, width, height);
-        let elapsed = Date.now() - startTime;
-        heartScale = 1 + 0.05 * Math.sin(elapsed / 200);
-        drawHeart();
-      }
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-
-    // Обработчик кнопки "Продолжить" – переход к этапу 2
+    // Обработка нажатия кнопки "Продолжить"
     continueBtn.addEventListener('click', () => {
-      animationStep = 2;
-      transitionStart = Date.now();
-      continueBtn.style.display = 'none';
-      messageEl.style.display = 'none';
+      // Переходим с этапа 1 на этап 2
+      stage1.classList.remove('active');
+      stage2.classList.add('active');
+
+      // Анимация: кнопка улетает вверх
+      continueBtn.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
+      continueBtn.style.transform = "translateY(-100px)";
+      continueBtn.style.opacity = "0";
+
+      // Через 0.8 сек – переключаемся на этап 3, имитируя затемнение экрана
+      setTimeout(() => {
+        stage2.classList.remove('active');
+        stage3.classList.add('active');
+        startHeartFormation();
+      }, 800);
     });
 
-    // Обработчик кнопки "Начать сначала" – сброс анимации
-    restartBtn.addEventListener('click', () => {
-      animationStep = 1;
-      heartFormed = false;
-      neonLines = [];
-      hearts.forEach(heart => {
-        heart.y = height + Math.random() * 100;
-      });
-      continueBtn.style.display = 'block';
-      messageEl.style.display = 'block';
-      restartBtn.style.display = 'none';
-    });
-
-    // После формирования сердца показываем кнопку перезапуска через некоторое время
-    setInterval(() => {
-      if (animationStep === 4) {
-        restartBtn.style.display = 'block';
+    // Функция анимации формирования сердца (Этап 3)
+    function startHeartFormation() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const lines = [];
+      const totalLines = 50;
+      // Генерируем линии, стартующие с краёв экрана
+      for (let i = 0; i < totalLines; i++) {
+        let startX, startY;
+        if (Math.random() < 0.5) {
+          startX = Math.random() < 0.5 ? 0 : canvas.width;
+          startY = Math.random() * canvas.height;
+        } else {
+          startX = Math.random() * canvas.width;
+          startY = Math.random() < 0.5 ? 0 : canvas.height;
+        }
+        lines.push({x: startX, y: startY});
       }
-    }, 3000);
 
-    // Если требуется, можно отправить данные обратно боту через Telegram Web App API
-    function sendDataToBot() {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData("valentine_closed");
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const animationDuration = 2000; // 2 секунды
+      const startTime = performance.now();
+
+      function animate() {
+        const now = performance.now();
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / animationDuration, 1);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        lines.forEach(line => {
+          // Линейная интерполяция от точки старта к центру
+          const currentX = line.x + (centerX - line.x) * t;
+          const currentY = line.y + (centerY - line.y) * t;
+          ctx.beginPath();
+          ctx.moveTo(line.x, line.y);
+          ctx.lineTo(currentX, currentY);
+          // Цвет линий с эффектом неона (розово-фиолетовый)
+          ctx.strokeStyle = 'rgba(255, 102, 204, ' + (1 - t) + ')';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        });
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // После завершения анимации переходим на этап 4
+          setTimeout(() => {
+            stage3.classList.remove('active');
+            stage4.classList.add('active');
+          }, 500);
+        }
       }
+      animate();
     }
-    window.addEventListener('beforeunload', sendDataToBot);
+
+    // Кнопка "Начать сначала" перезагружает веб-приложение
+    restartBtn.addEventListener('click', () => {
+      window.location.reload();
+    });
   </script>
 </body>
 </html>

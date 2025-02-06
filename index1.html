@@ -24,36 +24,37 @@
             align-items: center;
             flex-direction: column;
         }
-        .center-text {
-            font-size: 48px;
-            font-family: 'Arial', sans-serif;
-            color: white;
-            z-index: 2;
-            transition: opacity 1s ease-in-out;
-        }
-        .small-text {
-            font-size: 24px;
-            font-family: 'Arial', sans-serif;
-            color: rgba(255, 255, 255, 0.5);
-            z-index: 1;
-            transition: opacity 1s ease-in-out;
-        }
         .background {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom left, #ff66b2, #000000);
-            animation: background 10s infinite alternate;
+            background: #ff66b2; /* Розовый фон */
             z-index: 0;
         }
-        @keyframes background {
+        .center-text {
+            font-size: 48px;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            z-index: 2;
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+        }
+        .floating-heart {
+            position: absolute;
+            font-size: 24px;
+            color: pink;
+            opacity: 1;
+            animation: floatAndFade 5s linear forwards;
+        }
+        @keyframes floatAndFade {
             0% {
-                background: linear-gradient(to bottom left, #ff66b2, #000000);
+                opacity: 1;
+                transform: translateY(0);
             }
             100% {
-                background: linear-gradient(to top right, #ff66b2, #000000);
+                opacity: 0;
+                transform: translateY(-100vh);
             }
         }
         svg {
@@ -64,7 +65,6 @@
             width: 200px;
             height: 200px;
             opacity: 0;
-            animation: fadeIn 2s forwards;
         }
         path {
             fill: none;
@@ -111,30 +111,12 @@
         .hidden {
             opacity: 0;
         }
-        .floating-text {
-            position: absolute;
-            font-size: 16px;
-            color: white;
-            opacity: 0;
-            animation: floatAndFade 5s linear forwards;
-        }
-        @keyframes floatAndFade {
-            0% {
-                opacity: 1;
-                transform: translateY(0) rotate(0deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-200px) rotate(360deg);
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="background"></div>
         <div class="center-text">Люблю тебя ♥️</div>
-        <div class="small-text">нажми</div>
         <svg id="heartSvg" viewBox="0 0 200 200">
             <!-- Неоновое сердце -->
             <path d="M100,150 C75,120 50,90 50,50 A50,50 0 0,1 150,50 C150,90 125,120 100,150 Z" />
@@ -144,13 +126,13 @@
     </div>
 
     <script>
-        let isHeartVisible = false;
+        let isSecondStage = false;
 
         // Функция для создания летающего текста
         function createFloatingText() {
             const text = document.createElement('div');
-            text.classList.add('floating-text');
-            text.textContent = ['Люблю ❤️', 'Моя звезда ✨', 'Счастье 🌟'][Math.floor(Math.random() * 3)];
+            text.classList.add('floating-heart');
+            text.textContent = '♥️';
             text.style.left = Math.random() * 100 + 'vw';
             text.style.top = Math.random() * 100 + 'vh';
             document.body.appendChild(text);
@@ -161,23 +143,44 @@
             }, 5000);
         }
 
-        document.body.addEventListener('click', function () {
-            if (!isHeartVisible) {
-                // Скрываем тексты
-                document.querySelector('.center-text').classList.add('hidden');
-                document.querySelector('.small-text').classList.add('hidden');
+        // Функция для создания маленьких сердец при клике
+        function createSmallHearts(event) {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.textContent = '❤️';
+            heart.style.left = event.clientX + 'px';
+            heart.style.top = event.clientY + 'px';
+            document.body.appendChild(heart);
 
-                // Останавливаем фоновую анимацию
-                document.querySelector('.background').style.animation = 'none';
-                document.querySelector('.background').style.background = 'black';
+            // Удаление сердца после завершения анимации
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+
+        // Первая стадия: текст "Люблю тебя" и летающие сердца
+        setInterval(createFloatingText, 1000);
+
+        // Вторая стадия: переход к неоновому сердцу
+        document.body.addEventListener('click', function () {
+            if (!isSecondStage) {
+                isSecondStage = true;
+
+                // Анимация исчезновения текста и фона
+                document.querySelector('.center-text').style.transform = 'translateY(-100vh)';
+                document.querySelector('.center-text').style.opacity = '0';
+
+                // Запускаем анимацию фона (фон уходит вверх)
+                const background = document.querySelector('.background');
+                background.style.animation = 'floatAndFade 2s linear forwards';
 
                 // Показываем SVG сердца
-                document.getElementById('heartSvg').style.opacity = 1;
+                setTimeout(() => {
+                    document.getElementById('heartSvg').style.opacity = 1;
+                }, 2000);
 
-                isHeartVisible = true;
-
-                // Запускаем создание летающих текстов
-                setInterval(createFloatingText, 1000);
+                // Добавляем обработчик для создания маленьких сердец
+                document.body.addEventListener('click', createSmallHearts);
             }
         });
     </script>

@@ -1,245 +1,172 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Валентинка для Кирюши</title>
- <style>
- * {
- margin:0;
- padding:0;
- box-sizing: border-box;
- }
-
- body {
- width:100vw;
- height:100vh;
- overflow: hidden;
- background: linear-gradient(45deg, #ff99cc0%, #000100%);
- display: flex;
- justify-content: center;
- align-items: center;
- position: relative;
- }
-
- #gradient {
- position: absolute;
- width:100%;
- height:100%;
- background: linear-gradient(45deg, #ff99cc0%, #000100%);
- z-index:0;
- }
-
- .words {
- position: absolute;
- font-family: Arial, sans-serif;
- font-size:24px;
- color: rgba(255,255,255,0.1);
- opacity:0;
- animation: fadeInOut5s infinite;
- }
-
- .main-text {
- font-family: 'Arial', sans-serif;
- font-size:48px;
- color: #fff;
- text-align: center;
- z-index:1;
- }
-
- .click-hint {
- font-size:18px;
- color: rgba(255,255,255,0.3);
- margin-top:20px;
- text-align: center;
- }
-
- @keyframes fadeInOut {
-0%,100% { opacity:0; }
-50% { opacity:1; }
- }
-
- #heart {
- position: absolute;
- width:200px;
- height:200px;
- }
-
- .particles {
- position: absolute;
- width:100%;
- height:100%;
- }
-
- .particle {
- position: absolute;
- color: #ff99cc;
- font-size:12px;
- }
-
- .restart-btn {
- position: fixed;
- bottom:20px;
- padding:10px20px;
- background: rgba(255,255,255,0.1);
- border: none;
- border-radius:5px;
- color: #fff;
- cursor: pointer;
- font-size:16px;
- }
- </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Валентинка</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: black;
+            overflow: hidden;
+        }
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .center-text {
+            font-size: 48px;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            z-index: 2;
+        }
+        .small-text {
+            font-size: 24px;
+            font-family: 'Arial', sans-serif;
+            color: rgba(255, 255, 255, 0.5);
+            z-index: 1;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom left, #ff66b2, #000000);
+            animation: background 10s infinite alternate;
+            z-index: 0;
+        }
+        .floating-words {
+            position: absolute;
+            font-size: 30px;
+            color: white;
+            opacity: 0.1;
+            animation: floatingWords 5s ease-in-out infinite;
+            z-index: 1;
+        }
+        @keyframes background {
+            0% {
+                background: linear-gradient(to bottom left, #ff66b2, #000000);
+            }
+            100% {
+                background: linear-gradient(to top right, #ff66b2, #000000);
+            }
+        }
+        @keyframes floatingWords {
+            0% {
+                opacity: 0.1;
+                transform: translateX(-100px) translateY(-100px);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(100px) translateY(100px);
+            }
+            100% {
+                opacity: 0.1;
+                transform: translateX(-100px) translateY(-100px);
+            }
+        }
+        #heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 5px solid pink;
+            border-radius: 50%;
+            animation: heartPulse 1s infinite alternate;
+            display: none;
+        }
+        @keyframes heartPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+        .particle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: pink;
+            border-radius: 50%;
+            animation: particleAnimation 5s linear infinite;
+        }
+        @keyframes particleAnimation {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
- <div id="gradient"></div>
- <div class="main-text">Люблю тебя♥️</div>
- <div class="click-hint">нажми</div>
- <canvas id="heart"></canvas>
- <div class="particles"></div>
- <button class="restart-btn" onclick="restart()">Начать сначала</button>
+    <div class="container">
+        <div class="background"></div>
+        <div class="floating-words" style="top: 10%; left: 20%;">Любимая</div>
+        <div class="floating-words" style="top: 20%; left: 30%;">Моя звезда</div>
+        <div class="floating-words" style="top: 30%; left: 50%;">Счастье</div>
+        <div class="center-text">Люблю тебя ♥️</div>
+        <div class="small-text">нажми</div>
+        <div id="heart"></div>
+    </div>
 
- <script>
- let stage =1;
- let canvas = document.getElementById('heart');
- let ctx = canvas.getContext('2d');
- let particles = [];
+    <audio id="heartbeatSound" src="https://www.soundjay.com/button/sounds/beep-07.mp3"></audio>
 
- // Настройки canvas function resizeCanvas() {
- canvas.width = window.innerWidth;
- canvas.height = window.innerHeight;
- }
- resizeCanvas();
- window.addEventListener('resize', resizeCanvas);
+    <script>
+        let isHeartVisible = false;
 
- // Этап1: Плавающие слова function createFloatingWords() {
- const words = ['Любимая', 'Моя звезда', 'Счастье'];
- const word = document.createElement('div');
- word.className = 'words';
- word.textContent = words[Math.floor(Math.random() * words.length)];
- word.style.left = Math.random() * window.innerWidth + 'px';
- word.style.top = Math.random() * window.innerHeight + 'px';
- document.body.appendChild(word);
- word.style.animation = `fadeInOut ${Math.random() *3 +2}s linear infinite`;
- setTimeout(() => {
- word.remove();
- createFloatingWords();
- },5000);
- }
+        // Создание частиц
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.body.appendChild(particle);
 
- // Этап2: Переход function transition() {
- document.body.style.transition = 'all1.5s ease-out';
- document.body.style.transform = 'translateY(-100%)';
- setTimeout(() => {
- document.body.style.background = '#000';
- stage =3;
- drawNeonHeart();
- },1500);
- }
+            setTimeout(() => {
+                particle.remove();
+            }, 5000);
+        }
 
- // Этап3: Неоновое сердце function drawNeonHeart() {
- ctx.clearRect(0,0, canvas.width, canvas.height);
- // Рисование контура сердца ctx.beginPath();
- ctx.moveTo(canvas.width/2, canvas.height/2 -100);
- ctx.bezierCurveTo(
- canvas.width/2 -60, canvas.height/2 -100 -100,
- canvas.width/2 -100, canvas.height/2 +100,
- canvas.width/2, canvas.height/2 +100 );
- ctx.bezierCurveTo(
- canvas.width/2 +100, canvas.height/2 +100,
- canvas.width/2 +60, canvas.height/2 -100 -100,
- canvas.width/2, canvas.height/2 -100 );
- ctx.closePath();
- ctx.strokeStyle = '#ff99cc';
- ctx.lineWidth =2;
- ctx.stroke();
- // Неоновый эффект ctx.shadowColor = '#ff99cc';
- ctx.shadowBlur =20;
- setTimeout(() => {
- stage =4;
- pulsingHeart();
- },1000);
- }
+        document.body.addEventListener('click', function() {
+            if (!isHeartVisible) {
+                // Переход к следующему этапу
+                document.querySelector('.center-text').style.display = 'none';
+                document.querySelector('.small-text').style.display = 'none';
+                document.querySelector('.background').style.animation = 'none';
+                document.querySelector('.background').style.background = 'black';
+                document.getElementById('heart').style.display = 'block';
+                isHeartVisible = true;
 
- // Этап4: Пульсация сердца function pulsingHeart() {
- let scale =1;
- let growing = true;
- function animate() {
- ctx.clearRect(0,0, canvas.width, canvas.height);
- ctx.save();
- ctx.translate(canvas.width/2, canvas.height/2);
- ctx.scale(scale, scale);
- ctx.strokeStyle = 'rgba(255,153,204,0.5)';
- ctx.lineWidth =2;
- ctx.stroke(neonHeartPath());
- ctx.restore();
- if (growing) {
- scale +=0.02;
- if (scale >1.2) {
- growing = false;
- }
- } else {
- scale -=0.02;
- if (scale <1) {
- growing = true;
- }
- }
- requestAnimationFrame(animate);
- }
- animate();
- }
+                // Воспроизведение звука
+                const sound = document.getElementById('heartbeatSound');
+                sound.play();
 
- // Этап5: Взрыв частиц function particleExplosion(x, y) {
- const wordList = ['Люблю', 'Спасибо', 'Ты — моя радость', 'Звезда', 'Счастье'];
- const particleCount =50;
- for (let i =0; i < particleCount; i++) {
- const particle = document.createElement('div');
- particle.className = 'particle';
- particle.textContent = wordList[Math.floor(Math.random() * wordList.length)];
- particle.style.left = x + 'px';
- particle.style.top = y + 'px';
- const angle = Math.random() * Math.PI *2;
- const velocity = Math.random() *5 +2;
- const dx = Math.cos(angle) * velocity;
- const dy = Math.sin(angle) * velocity;
- particle.style.animation = `particle ${Math.random() *0.5 +1}s linear infinite`;
- document.body.appendChild(particle);
- setTimeout(() => {
- particle.remove();
- },2000);
- }
- }
+                setTimeout(() => {
+                    document.getElementById('heart').style.animation = 'heartPulse 1s infinite alternate';
+                }, 1000);
 
- function neonHeartPath() {
- ctx.beginPath();
- ctx.moveTo(canvas.width/2, canvas.height/2 -100);
- ctx.bezierCurveTo(
- canvas.width/2 -60, canvas.height/2 -200,
- canvas.width/2 -100, canvas.height/2,
- canvas.width/2, canvas.height/2 +100 );
- ctx.bezierCurveTo(
- canvas.width/2 +100, canvas.height/2,
- canvas.width/2 +60, canvas.height/2 -200,
- canvas.width/2, canvas.height/2 -100 );
- ctx.closePath();
- return ctx;
- }
-
- function restart() {
- location.reload();
- }
-
- // События document.addEventListener('DOMContentLoaded', createFloatingWords);
- document.addEventListener('click', (e) => {
- if (stage ===1) {
- transition();
- } else if (stage ===4) {
- const rect = canvas.getBoundingClientRect();
- const x = e.clientX - rect.left;
- const y = e.clientY - rect.top;
- particleExplosion(x, y);
- }
- });
-
- // Начальная анимация createFloatingWords();
- </script>
+                // Создание частиц
+                setInterval(createParticle, 200);
+            }
+        });
+    </script>
 </body>
 </html>

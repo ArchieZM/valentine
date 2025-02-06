@@ -15,6 +15,14 @@
             background-color: black;
             overflow: hidden;
         }
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Чтобы курсор не мешал взаимодействию */
+        }
         .container {
             position: relative;
             width: 100vw;
@@ -24,38 +32,12 @@
             align-items: center;
             flex-direction: column;
         }
-        .background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #ff66b2; /* Розовый фон */
-            z-index: 0;
-        }
         .center-text {
             font-size: 48px;
             font-family: 'Arial', sans-serif;
             color: white;
             z-index: 2;
             transition: transform 1s ease-in-out, opacity 1s ease-in-out;
-        }
-        .floating-heart {
-            position: absolute;
-            font-size: 24px;
-            color: pink;
-            opacity: 1;
-            animation: floatAndFade 5s linear forwards;
-        }
-        @keyframes floatAndFade {
-            0% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-100vh);
-            }
         }
         svg {
             position: absolute;
@@ -108,14 +90,10 @@
                 opacity: 1;
             }
         }
-        .hidden {
-            opacity: 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="background"></div>
         <div class="center-text">Люблю тебя ♥️</div>
         <svg id="heartSvg" viewBox="0 0 200 200">
             <!-- Неоновое сердце -->
@@ -125,62 +103,42 @@
         </svg>
     </div>
 
+    <!-- Контейнер для NeonCursor -->
+    <div id="app"></div>
+
+    <!-- Подключение библиотеки NeonCursor -->
+    <script src="https://cdn.jsdelivr.net/npm/neon-cursor@1.0.0/dist/neonCursor.min.js"></script>
     <script>
+        // Инициализация NeonCursor
+        neonCursor({
+            el: document.getElementById('app'),
+            shaderPoints: 16,
+            curvePoints: 80,
+            curveLerp: 0.5,
+            radius1: 5,
+            radius2: 30,
+            velocityTreshold: 10,
+            sleepRadiusX: 100,
+            sleepRadiusY: 100,
+            sleepTimeCoefX: 0.0025,
+            sleepTimeCoefY: 0.0025
+        });
+
         let isSecondStage = false;
-
-        // Функция для создания летающего текста
-        function createFloatingText() {
-            const text = document.createElement('div');
-            text.classList.add('floating-heart');
-            text.textContent = '♥️';
-            text.style.left = Math.random() * 100 + 'vw';
-            text.style.top = Math.random() * 100 + 'vh';
-            document.body.appendChild(text);
-
-            // Удаление текста после завершения анимации
-            setTimeout(() => {
-                text.remove();
-            }, 5000);
-        }
-
-        // Функция для создания маленьких сердец при клике
-        function createSmallHearts(event) {
-            const heart = document.createElement('div');
-            heart.classList.add('floating-heart');
-            heart.textContent = '❤️';
-            heart.style.left = event.clientX + 'px';
-            heart.style.top = event.clientY + 'px';
-            document.body.appendChild(heart);
-
-            // Удаление сердца после завершения анимации
-            setTimeout(() => {
-                heart.remove();
-            }, 5000);
-        }
-
-        // Первая стадия: текст "Люблю тебя" и летающие сердца
-        setInterval(createFloatingText, 1000);
 
         // Вторая стадия: переход к неоновому сердцу
         document.body.addEventListener('click', function () {
             if (!isSecondStage) {
                 isSecondStage = true;
 
-                // Анимация исчезновения текста и фона
+                // Анимация исчезновения текста
                 document.querySelector('.center-text').style.transform = 'translateY(-100vh)';
                 document.querySelector('.center-text').style.opacity = '0';
-
-                // Запускаем анимацию фона (фон уходит вверх)
-                const background = document.querySelector('.background');
-                background.style.animation = 'floatAndFade 2s linear forwards';
 
                 // Показываем SVG сердца
                 setTimeout(() => {
                     document.getElementById('heartSvg').style.opacity = 1;
                 }, 2000);
-
-                // Добавляем обработчик для создания маленьких сердец
-                document.body.addEventListener('click', createSmallHearts);
             }
         });
     </script>

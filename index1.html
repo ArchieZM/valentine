@@ -2,13 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Настройка viewport для мобильных устройств и учёт безопасных зон -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Валентинка</title>
   <style>
-    /* Сброс отступов и настройка базовых стилей */
+    /* Сброс отступов, настройка базовых стилей и безопасных зон */
     html, body {
       margin: 0;
-      padding: 0;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       height: 100%;
       overflow: hidden;
       background: linear-gradient(to bottom right, #ffccff, #000);
@@ -18,8 +19,8 @@
       font-family: sans-serif;
       color: white;
     }
-    /* Общие стили для этапов */
-    #stage1, #stage2, #stage3, #stage4 {
+    /* Контейнеры этапов */
+    .stage {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -27,24 +28,28 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
     }
-    /* Отображаем активный этап */
     .active {
       display: flex;
     }
-    .continue-btn, .restart-btn {
+    /* Стили кнопок */
+    .btn {
       margin-top: 20px;
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 18px;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
     }
     .continue-btn {
       background-color: #00aaff;
+      color: white;
     }
     .restart-btn {
       background-color: #ff6699;
+      color: white;
     }
     /* Анимация пульсации сердца */
     @keyframes beat {
@@ -54,48 +59,55 @@
       75% { transform: scale(0.9); }
       100% { transform: scale(1); }
     }
-    /* Элемент сердца на этапе 4 */
+    /* Стили для сердца (этап 4) */
     #heart {
-      width: 200px;
-      height: 200px;
+      width: 40vmin;
+      height: 40vmin;
       background: radial-gradient(circle at 50% 50%, #ff99cc, #cc66ff);
-      /* Простейшая векторная форма сердца (clip-path можно заменить SVG или другим решением) */
       clip-path: path("M 10,30 A 20,20 0,0,1,50,30 Q 50,60 30,80 Q 10,60 10,30 z");
       animation: beat 1s infinite;
     }
-    /* Canvas на всю страницу (для анимации формирования сердца) */
+    /* Canvas на всю страницу (этап 3) */
     #canvas {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100vw;
+      height: 100vh;
     }
   </style>
 </head>
 <body>
   <!-- Этап 1: Начальный экран -->
-  <div id="stage1" class="active">
-    <h1>Я люблю тебя ♥️</h1>
-    <button id="continueBtn" class="continue-btn">Продолжить</button>
+  <div id="stage1" class="stage active">
+    <h1 style="font-size: 8vmin; text-align: center;">Я люблю тебя ♥️</h1>
+    <button id="continueBtn" class="btn continue-btn">Продолжить</button>
   </div>
   
-  <!-- Этап 2: Переход (симуляция затемнения) -->
-  <div id="stage2">
-    <!-- Здесь можно добавить дополнительные эффекты при переходе -->
+  <!-- Этап 2: Переход (плавное затемнение) -->
+  <div id="stage2" class="stage">
+    <!-- Дополнительные визуальные эффекты можно добавить здесь -->
   </div>
   
   <!-- Этап 3: Формирование сердца (анимация на canvas) -->
-  <div id="stage3">
+  <div id="stage3" class="stage">
     <canvas id="canvas"></canvas>
   </div>
   
   <!-- Этап 4: Биение сердца -->
-  <div id="stage4">
+  <div id="stage4" class="stage">
     <div id="heart"></div>
-    <button id="restartBtn" class="restart-btn">Начать сначала</button>
+    <button id="restartBtn" class="btn restart-btn">Начать сначала</button>
   </div>
 
   <script>
-    // Настройка canvas
+    // Если приложение запущено как Telegram Web App, можно воспользоваться API для дальнейшей настройки
+    if (window.Telegram && window.Telegram.WebApp) {
+      // Например, установка цвета фона
+      Telegram.WebApp.MainButton.hide();
+    }
+
+    // Функция изменения размеров canvas под размер экрана
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     function resizeCanvas() {
@@ -113,9 +125,8 @@
     const continueBtn = document.getElementById('continueBtn');
     const restartBtn = document.getElementById('restartBtn');
 
-    // Обработка нажатия кнопки "Продолжить"
+    // Переход от этапа 1 к этапу 2
     continueBtn.addEventListener('click', () => {
-      // Переходим с этапа 1 на этап 2
       stage1.classList.remove('active');
       stage2.classList.add('active');
 
@@ -124,7 +135,7 @@
       continueBtn.style.transform = "translateY(-100px)";
       continueBtn.style.opacity = "0";
 
-      // Через 0.8 сек – переключаемся на этап 3, имитируя затемнение экрана
+      // После 0.8 сек – переход к этапу 3 (симуляция затемнения)
       setTimeout(() => {
         stage2.classList.remove('active');
         stage3.classList.add('active');
@@ -132,12 +143,12 @@
       }, 800);
     });
 
-    // Функция анимации формирования сердца (Этап 3)
+    // Анимация формирования сердца (Этап 3)
     function startHeartFormation() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const lines = [];
       const totalLines = 50;
-      // Генерируем линии, стартующие с краёв экрана
+      // Генерация стартовых точек по краям экрана
       for (let i = 0; i < totalLines; i++) {
         let startX, startY;
         if (Math.random() < 0.5) {
@@ -161,13 +172,12 @@
         const t = Math.min(elapsed / animationDuration, 1);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         lines.forEach(line => {
-          // Линейная интерполяция от точки старта к центру
+          // Линейная интерполяция от исходной точки к центру экрана
           const currentX = line.x + (centerX - line.x) * t;
           const currentY = line.y + (centerY - line.y) * t;
           ctx.beginPath();
           ctx.moveTo(line.x, line.y);
           ctx.lineTo(currentX, currentY);
-          // Цвет линий с эффектом неона (розово-фиолетовый)
           ctx.strokeStyle = 'rgba(255, 102, 204, ' + (1 - t) + ')';
           ctx.lineWidth = 2;
           ctx.stroke();
@@ -175,7 +185,7 @@
         if (t < 1) {
           requestAnimationFrame(animate);
         } else {
-          // После завершения анимации переходим на этап 4
+          // После завершения анимации — переход к этапу 4
           setTimeout(() => {
             stage3.classList.remove('active');
             stage4.classList.add('active');
@@ -185,7 +195,7 @@
       animate();
     }
 
-    // Кнопка "Начать сначала" перезагружает веб-приложение
+    // Кнопка "Начать сначала" перезагружает приложение
     restartBtn.addEventListener('click', () => {
       window.location.reload();
     });

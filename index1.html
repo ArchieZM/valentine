@@ -15,10 +15,10 @@
       height: 100%;
       overflow: hidden;
       font-family: 'Arial', sans-serif;
-      background: linear-gradient(to bottom left, #000, #ffc0cb);
-      position: relative;
+      /* По умолчанию фон будет заменён на чёрный, а наш контейнер с фоном будет анимироваться */
+      background: #000;
     }
-    /* Контейнер приложения */
+    /* Контейнер приложения, который будет анимироваться */
     #app {
       position: relative;
       width: 100%;
@@ -28,24 +28,22 @@
       user-select: none;
       cursor: pointer;
       overflow: hidden;
+      transition: transform 1.5s ease-in-out;
       z-index: 1;
     }
-    /* Фон стартового экрана с анимацией градиента */
-    #background {
+    /* Начальный фон: указанная SVG-картинка */
+    #initialBg {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(45deg, rgba(255,192,203,0.7), rgba(0,0,0,0.7));
-      animation: gradientShift 10s ease-in-out infinite alternate;
-      z-index: 0;
+      background: url("https://xmple.com/wallpaper/gradient-purple-linear-black-2880x5120-c2-ff00ff-000000-a-90-f-14.svg") no-repeat center center;
+      background-size: cover;
+      z-index: -1;
+      transition: transform 1.5s ease-in-out;
     }
-    @keyframes gradientShift {
-      0%   { background-position: top right; }
-      100% { background-position: bottom left; }
-    }
-    /* Основной текст (Этап 1) */
+    /* Основной текст */
     #mainText {
       position: absolute;
       top: 40%;
@@ -54,6 +52,7 @@
       font-weight: bold;
       z-index: 2;
       text-shadow: 2px 2px 4px #000;
+      transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
     }
     /* Подсказка "нажми" */
     #hint {
@@ -63,8 +62,9 @@
       font-size: 18px;
       opacity: 0.5;
       z-index: 2;
+      transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
     }
-    /* Кнопка перезапуска */
+    /* Кнопка перезапуска (без изменений) */
     #restartBtn {
       position: absolute;
       bottom: 20px;
@@ -122,11 +122,8 @@
 </head>
 <body>
   <div id="app">
-    <!-- Фоновый слой -->
-    <div id="background"></div>
-
-    <!-- Генерация плавающих слов на начальном экране -->
-    <canvas id="wordCanvas"></canvas>
+    <!-- Начальный фон с указанной SVG-картинкой -->
+    <div id="initialBg"></div>
 
     <!-- Основной текст -->
     <div id="mainText">Люблю тебя♥️</div>
@@ -138,7 +135,7 @@
       <svg viewBox="0 0 200 200" width="200" height="200">
         <path id="heartPath" d="M100,30 C70,50 50,80 50,120 A50,50 0 0,0 150,120 C150,80 130,50 100,30 Z"
               fill="none"
-              stroke="#0ff"
+              stroke="#ff69b4"
               stroke-width="4"
               stroke-linecap="round"
               stroke-dasharray="628"
@@ -155,7 +152,7 @@
       </svg>
       <style>
         #heartPath {
-          filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #0ff) drop-shadow(0 0 30px #0ff);
+          filter: drop-shadow(0 0 10px #ff69b4) drop-shadow(0 0 20px #ff69b4) drop-shadow(0 0 30px #ff69b4);
         }
       </style>
     </div>
@@ -173,7 +170,7 @@
   <script>
     /* ===== Настройки и переменные ===== */
     const app = document.getElementById('app');
-    const background = document.getElementById('background');
+    const initialBg = document.getElementById('initialBg');
     const mainText = document.getElementById('mainText');
     const hint = document.getElementById('hint');
     const neonHeart = document.getElementById('neonHeart');
@@ -181,128 +178,50 @@
     const restartBtn = document.getElementById('restartBtn');
     const particleCanvas = document.getElementById('particleCanvas');
     const pctx = particleCanvas.getContext('2d');
-    const wordCanvas = document.getElementById('wordCanvas');
-    const wctx = wordCanvas.getContext('2d');
 
     let canvasWidth = window.innerWidth;
     let canvasHeight = window.innerHeight;
     particleCanvas.width = canvasWidth;
     particleCanvas.height = canvasHeight;
-    wordCanvas.width = canvasWidth;
-    wordCanvas.height = canvasHeight;
 
     // Этапы:
-    // 1 – начальный экран с плавающими словами;
-    // 2 – переход (подъём элементов и затемнение);
-    // 3 – рисуется неоновое сердце;
-    // 4 – пульсирующее сердце внутри и ожидание кликов для частиц.
+    // 1 – начальный экран с указанным фоном и текстом;
+    // 2 – после клика весь контейнер (фон, текст и прочее) плавно поднимается вверх,
+    //     оставляя черный фон под ним;
+    // 3 – появляется неоновое сердце и далее пульсирующее сердце, а затем эффекты частиц.
     let stage = 1;
-    let transitionStarted = false;
-    let transitionStartTime = 0;
-
-    // Массив для плавающих слов (на Этапе 1)
-    const floatingWords = [];
-    // Список добрых слов для эффекта частиц (больше слов)
-    const goodWords = [
-      "Люблю", "Спасибо", "Ты — моя радость", "Звезда", "Счастье",
-      "Обожаю", "Нежность", "Улыбка", "Свет", "Вдохновение",
-      "Мечта", "Доброта", "Тепло", "Радость", "Магия",
-      "Очарование", "Сияние", "Сладость", "Бесконечно", "Драгоценность",
-      "Сердце", "Любовь", "Нежность", "Уют", "Верность"
-    ];
-
-    /* ===== Обновление размеров canvas ===== */
-    window.addEventListener('resize', () => {
-      canvasWidth = window.innerWidth;
-      canvasHeight = window.innerHeight;
-      particleCanvas.width = canvasWidth;
-      particleCanvas.height = canvasHeight;
-      wordCanvas.width = canvasWidth;
-      wordCanvas.height = canvasHeight;
+    
+    /* ===== Обработка клика для перехода ===== */
+    app.addEventListener('click', () => {
+      if (stage === 1) {
+        // Запускаем анимацию подъёма контейнера: смещаем вверх на высоту экрана
+        app.style.transform = `translateY(-${canvasHeight}px)`;
+        // А также смещаем фон, чтобы он двигался синхронно
+        initialBg.style.transform = `translateY(-${canvasHeight}px)`;
+        // После окончания анимации (1.5 сек) запускаем следующий этап
+        setTimeout(() => {
+          stage = 2;
+          // Показываем неоновое сердце
+          neonHeart.style.display = 'block';
+          // После 2 секунд отображаем пульсирующее сердце (Этап 4)
+          setTimeout(() => {
+            pulsingHeart.style.display = 'block';
+            stage = 3;
+          }, 2200);
+        }, 1500);
+      }
     });
 
-    /* ===== Плавающие слова на Этапе 1 ===== */
-    // Создаём случайное слово с позицией, скоростью и временем жизни
-    function spawnFloatingWord() {
-      const word = goodWords[Math.floor(Math.random() * goodWords.length)];
-      floatingWords.push({
-        text: word,
-        x: Math.random() * canvasWidth,
-        y: canvasHeight + Math.random() * 50,
-        speed: 0.3 + Math.random() * 0.7,
-        opacity: 0,
-        life: 0,
-        maxLife: 300 + Math.random() * 200
-      });
-    }
-    // Запускаем периодически рождение слов (каждые 800 мс)
-    setInterval(spawnFloatingWord, 800);
-
-    // Отрисовка плавающих слов
-    function updateFloatingWords() {
-      wctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      for (let i = floatingWords.length - 1; i >= 0; i--) {
-        const wordObj = floatingWords[i];
-        wordObj.life++;
-        // Плавное появление и исчезновение
-        if (wordObj.life < 50) {
-          wordObj.opacity = wordObj.life / 50;
-        } else if (wordObj.life > wordObj.maxLife - 50) {
-          wordObj.opacity = (wordObj.maxLife - wordObj.life) / 50;
-        } else {
-          wordObj.opacity = 1;
-        }
-        wctx.font = "20px Arial";
-        wctx.fillStyle = `rgba(255,255,255,${wordObj.opacity * 0.3})`;
-        wctx.fillText(wordObj.text, wordObj.x, wordObj.y);
-        wordObj.y -= wordObj.speed;
-        if (wordObj.life > wordObj.maxLife) {
-          floatingWords.splice(i, 1);
-        }
-      }
-    }
-
-    /* ===== Переход (Этап 2) ===== */
-    function startTransition() {
-      if (stage !== 1) return;
-      stage = 2;
-      transitionStarted = true;
-      transitionStartTime = Date.now();
-    }
-    function animateTransition() {
-      const elapsed = Date.now() - transitionStartTime;
-      // Перемещаем все элементы вверх в течение 1500 мс
-      const offset = Math.min(elapsed / 1.5, window.innerHeight);
-      app.style.transform = `translateY(-${offset}px)`;
-      // Если прошло 1500 мс, делаем фон полностью чёрным и скрываем текст
-      if (elapsed >= 1500) {
-        background.style.background = "#000";
-        mainText.style.opacity = 0;
-        hint.style.opacity = 0;
-        // После 500 мс запускаем этап 3
-        if (stage === 2) {
-          setTimeout(() => {
-            stage = 3;
-            showNeonHeart();
-          }, 500);
-        }
-      }
-    }
-
-    /* ===== Этап 3: Отображение неонового сердца ===== */
-    function showNeonHeart() {
-      neonHeart.style.display = 'block';
-      // После завершения анимации неонового контура (около 2 сек) переходим к этапу 4:
-      setTimeout(() => {
-        pulsingHeart.style.display = 'block';
-        stage = 4;
-      }, 2200);
-    }
-
-    /* ===== Эффект частиц при клике (Этап 5) ===== */
+    /* ===== Эффект частиц (пример, этап 3/4) ===== */
     const particles = [];
     function createParticleExplosion(x, y) {
-      // Создаём от 20 до 40 частиц
+      const goodWords = [
+        "Люблю", "Спасибо", "Ты — моя радость", "Звезда", "Счастье",
+        "Обожаю", "Нежность", "Улыбка", "Свет", "Вдохновение",
+        "Мечта", "Доброта", "Тепло", "Радость", "Магия",
+        "Очарование", "Сияние", "Сладость", "Бесконечно", "Драгоценность",
+        "Сердце", "Любовь", "Уют", "Верность"
+      ];
       const count = 20 + Math.floor(Math.random() * 20);
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -316,8 +235,7 @@
           word: goodWords[Math.floor(Math.random() * goodWords.length)],
           fontSize: 14 + Math.random() * 12,
           opacity: 1,
-          // Дополнительно добавляем случайное смещение для "сердца"
-          isHeart: Math.random() > 0.5
+          isHeart: Math.random() < 0.5
         });
       }
     }
@@ -330,7 +248,6 @@
         p.life--;
         p.opacity = p.life / 90;
         if (p.isHeart) {
-          // Рисуем маленькое сердце (через рисование Path)
           pctx.save();
           pctx.translate(p.x, p.y);
           pctx.scale(0.03 * p.fontSize, 0.03 * p.fontSize);
@@ -342,7 +259,6 @@
           pctx.fill();
           pctx.restore();
         } else {
-          // Рисуем слово
           pctx.font = `${p.fontSize}px Arial`;
           pctx.fillStyle = `rgba(255,255,255,${p.opacity})`;
           pctx.fillText(p.word, p.x, p.y);
@@ -352,61 +268,35 @@
         }
       }
     }
-
-    /* ===== Обработка кликов ===== */
+    // Для примера: при клике на уже поднятом экране запускаем эффект частиц
     app.addEventListener('click', (e) => {
-      if (stage === 1) {
-        startTransition();
-      } else if (stage === 4) {
-        // При клике на этапе 4 запускаем эффект частиц в точке клика
+      if (stage === 3) {
         createParticleExplosion(e.clientX, e.clientY);
       }
     });
-
-    /* ===== Основной цикл анимации ===== */
     function animate() {
-      if (stage === 2 && transitionStarted) {
-        animateTransition();
-      }
-      updateFloatingWords();
       updateParticles();
       requestAnimationFrame(animate);
     }
-    requestAnimationFrame(animate);
+    animate();
 
     /* ===== Обработка кнопки перезапуска ===== */
     restartBtn.addEventListener('click', () => {
-      // Сброс всех параметров и этапов
       stage = 1;
-      transitionStarted = false;
       app.style.transform = 'translateY(0)';
-      background.style.background = "linear-gradient(45deg, rgba(255,192,203,0.7), rgba(0,0,0,0.7))";
-      mainText.style.opacity = 1;
-      hint.style.opacity = 1;
+      initialBg.style.transform = 'translateY(0)';
       neonHeart.style.display = 'none';
       pulsingHeart.style.display = 'none';
       restartBtn.style.display = 'none';
-      // Очистка частиц и плавающих слов
       particles.length = 0;
-      floatingWords.length = 0;
-      // Очистка canvas-слоя для слов
-      wctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      pctx.clearRect(0, 0, canvasWidth, canvasHeight);
     });
-
-    // Показываем кнопку перезапуска через 5 секунд после перехода на этап 4
+    // Показываем кнопку перезапуска через 5 секунд после появления пульсирующего сердца
     setTimeout(() => {
-      if (stage >= 4) {
+      if (stage === 3) {
         restartBtn.style.display = 'block';
       }
     }, 5000);
-
-    /* ===== Отправка данных боту через Telegram Web App API (если требуется) ===== */
-    function sendDataToBot() {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData("valentine_done");
-      }
-    }
-    window.addEventListener('beforeunload', sendDataToBot);
   </script>
 </body>
 </html>

@@ -1,0 +1,152 @@
+<html lang="ru">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Валентинка для Киры</title>
+ <style>
+ body {
+ margin:0;
+ padding:0;
+ width:100%;
+ height:100vh;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ background: linear-gradient(45deg, #ff99cc0%, #000000100%);
+ overflow: hidden;
+ font-family: 'Arial', sans-serif;
+ }
+
+ .container {
+ position: relative;
+ width:100%;
+ height:100%;
+ }
+
+ .main-text {
+ position: absolute;
+ top:50%;
+ left:50%;
+ transform: translate(-50%, -50%);
+ font-size:48px;
+ color: white;
+ text-shadow:2px2px4px rgba(0,0,0,0.5);
+ z-index:2;
+ }
+
+ .hearts {
+ position: absolute;
+ width:100%;
+ height:100%;
+ }
+
+ .words {
+ position: absolute;
+ width:100%;
+ height:100%;
+ }
+
+ .continue-btn {
+ position: absolute;
+ bottom:20%;
+ left:50%;
+ transform: translateX(-50%);
+ padding:10px20px;
+ font-size:18px;
+ background: #3498db;
+ color: white;
+ border: none;
+ border-radius:5px;
+ cursor: pointer;
+ transition: all0.3s;
+ z-index:3;
+ }
+
+ .continue-btn:hover {
+ background: #2980b9;
+ }
+
+ .restart-btn {
+ display: none;
+ position: absolute;
+ top:20px;
+ right:20px;
+ padding:10px20px;
+ font-size:16px;
+ background: #e74c3c;
+ color: white;
+ border: none;
+ border-radius:5px;
+ cursor: pointer;
+ z-index:3;
+ }
+
+ .black-screen {
+ position: absolute;
+ width:100%;
+ height:100%;
+ background: black;
+ display: none;
+ }
+
+ .heart-canvas {
+ position: absolute;
+ width:100%;
+ height:100%;
+ }
+ </style>
+</head>
+<body>
+ <div class="container">
+ <div class="main-text">Я люблю тебя♥️</div>
+ <canvas class="hearts" id="heartsCanvas"></canvas>
+ <canvas class="words" id="wordsCanvas"></canvas>
+ <button class="continue-btn" onclick="nextStage()">Продолжить</button>
+ <button class="restart-btn" onclick="restart()">Начать сначала</button>
+ <div class="black-screen" id="blackScreen"></div>
+ <canvas class="heart-canvas" id="heartCanvas"></canvas>
+ </div>
+
+ <script>
+ let currentStage =1;
+ const heartsCanvas = document.getElementById('heartsCanvas');
+ const wordsCanvas = document.getElementById('wordsCanvas');
+ const heartCanvas = document.getElementById('heartCanvas');
+ const blackScreen = document.getElementById('blackScreen');
+ const continueBtn = document.querySelector('.continue-btn');
+ const restartBtn = document.querySelector('.restart-btn');
+
+ // Анимация сердечек и слов function animateHeartsAndWords() {
+ // Реализуйте анимацию сердечек и слов здесь // Например, используя requestAnimationFrame }
+
+ function nextStage() {
+ if (currentStage ===1) {
+ currentStage =2;
+ continueBtn.style.display = 'none';
+ blackScreen.style.display = 'block';
+ setTimeout(() => {
+ currentStage =3;
+ blackScreen.style.display = 'none';
+ drawHeart();
+ restartBtn.style.display = 'block';
+ },1000);
+ }
+ }
+
+ function drawHeart() {
+ // Отрисовка сердца const ctx = heartCanvas.getContext('2d');
+ // Реализуйте рисование сердца }
+
+ function restart() {
+ currentStage =1;
+ continueBtn.style.display = 'block';
+ restartBtn.style.display = 'none';
+ blackScreen.style.display = 'none';
+ // Сброс анимаций }
+
+ // Инициализация window.onload = function() {
+ animateHeartsAndWords();
+ };
+ </script>
+</body>
+</html>

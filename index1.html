@@ -15,7 +15,7 @@
       height: 100%;
       overflow: hidden;
       font-family: 'Arial', sans-serif;
-      /* По умолчанию фон будет заменён на чёрный, а наш контейнер с фоном будет анимироваться */
+      /* Фон body – чёрный, чтобы после анимации был чёрный фон */
       background: #000;
     }
     /* Контейнер приложения, который будет анимироваться */
@@ -31,7 +31,7 @@
       transition: transform 1.5s ease-in-out;
       z-index: 1;
     }
-    /* Начальный фон: указанная SVG-картинка */
+    /* Начальный фон – указанная SVG-картинка */
     #initialBg {
       position: absolute;
       top: 0;
@@ -43,28 +43,36 @@
       z-index: -1;
       transition: transform 1.5s ease-in-out;
     }
-    /* Основной текст */
+    /* Основной текст – сделан более заметным */
     #mainText {
       position: absolute;
-      top: 40%;
+      top: 38%;
       width: 100%;
-      font-size: 48px;
-      font-weight: bold;
+      font-size: 60px;
+      font-weight: 900;
       z-index: 2;
-      text-shadow: 2px 2px 4px #000;
+      text-shadow: 4px 4px 8px #000;
+      opacity: 1;
       transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
+      animation: pulseText 2s infinite alternate;
     }
-    /* Подсказка "нажми" */
+    @keyframes pulseText {
+      from { text-shadow: 4px 4px 8px #000; }
+      to { text-shadow: 8px 8px 16px #ff00ff; }
+    }
+    /* Подсказка "нажми" – сделана почти незаметной */
     #hint {
       position: absolute;
-      top: 55%;
+      top: 50%;
       width: 100%;
-      font-size: 18px;
-      opacity: 0.5;
+      font-size: 14px;
+      font-weight: normal;
+      opacity: 0.1;
       z-index: 2;
       transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
+      /* Убираем анимацию мерцания, чтобы текст оставался едва заметным */
     }
-    /* Кнопка перезапуска (без изменений) */
+    /* Кнопка перезапуска */
     #restartBtn {
       position: absolute;
       bottom: 20px;
@@ -122,12 +130,12 @@
 </head>
 <body>
   <div id="app">
-    <!-- Начальный фон с указанной SVG-картинкой -->
+    <!-- Начальный фон -->
     <div id="initialBg"></div>
 
     <!-- Основной текст -->
     <div id="mainText">Люблю тебя♥️</div>
-    <!-- Подсказка -->
+    <!-- Подсказка (почти незаметная) -->
     <div id="hint">нажми</div>
 
     <!-- SVG неонового сердца (Этап 3) -->
@@ -185,43 +193,63 @@
     particleCanvas.height = canvasHeight;
 
     // Этапы:
-    // 1 – начальный экран с указанным фоном и текстом;
-    // 2 – после клика весь контейнер (фон, текст и прочее) плавно поднимается вверх,
-    //     оставляя черный фон под ним;
-    // 3 – появляется неоновое сердце и далее пульсирующее сердце, а затем эффекты частиц.
+    // stage = 1 – начальный экран (фон, текст, подсказка)
+    // stage = 2 – анимация подъёма (фон, текст и подсказка уходят вверх)
+    // stage = 3 – отображается неоновое сердце и пульсирующее сердце (после чего клики запускают эффект частиц)
     let stage = 1;
-    
-    /* ===== Обработка клика для перехода ===== */
-    app.addEventListener('click', () => {
+    console.log("Начальный этап: stage =", stage);
+
+    /* ===== Список характеристик для Киры ===== */
+    const kiraAttributes = [
+      "Любимая", "Моя звезда", "Нежная", "Очаровательная", "Уникальная",
+      "Мечта", "Свет моей жизни", "Драгоценность", "Радость", "Сердце"
+    ];
+
+    /* ===== Эффект плавающих элементов (используем характеристики Киры) ===== */
+    // Массив для плавающих элементов
+    const floatingItems = [];
+    // Функция создания случайного плавающего элемента
+    function spawnFloatingItem() {
+      let text = kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)];
+      floatingItems.push({
+        text: text,
+        x: Math.random() * canvasWidth,
+        y: canvasHeight + Math.random() * 50,
+        speed: 0.5 + Math.random(), // немного быстрее
+        opacity: 0,
+        life: 0,
+        maxLife: 200 + Math.random() * 150,
+        fontSize: 28 + Math.random() * 10  // увеличенный шрифт для заметности
+      });
+    }
+    // Запускаем спаун каждые 400 мс
+    setInterval(spawnFloatingItem, 400);
+    // Отрисовка плавающих элементов на дополнительном canvas можно добавить по желанию
+
+    /* ===== Переход: при клике на экран весь контейнер поднимается вверх ===== */
+    app.addEventListener('click', (event) => {
       if (stage === 1) {
-        // Запускаем анимацию подъёма контейнера: смещаем вверх на высоту экрана
+        console.log("Клик на этапе 1. Запуск анимации подъёма...");
         app.style.transform = `translateY(-${canvasHeight}px)`;
-        // А также смещаем фон, чтобы он двигался синхронно
         initialBg.style.transform = `translateY(-${canvasHeight}px)`;
-        // После окончания анимации (1.5 сек) запускаем следующий этап
         setTimeout(() => {
           stage = 2;
-          // Показываем неоновое сердце
+          console.log("Этап 2: контейнер поднят. Отображаем неоновое сердце...");
           neonHeart.style.display = 'block';
-          // После 2 секунд отображаем пульсирующее сердце (Этап 4)
           setTimeout(() => {
             pulsingHeart.style.display = 'block';
             stage = 3;
+            console.log("Этап 3: неоновое и пульсирующее сердце отображены. Теперь клики запускают эффект частиц.");
           }, 2200);
         }, 1500);
+      } else if (stage === 3) {
+        createParticleExplosion(event.clientX, event.clientY);
       }
     });
 
-    /* ===== Эффект частиц (пример, этап 3/4) ===== */
+    /* ===== Эффект частиц (Этап 3/4) ===== */
     const particles = [];
     function createParticleExplosion(x, y) {
-      const goodWords = [
-        "Люблю", "Спасибо", "Ты — моя радость", "Звезда", "Счастье",
-        "Обожаю", "Нежность", "Улыбка", "Свет", "Вдохновение",
-        "Мечта", "Доброта", "Тепло", "Радость", "Магия",
-        "Очарование", "Сияние", "Сладость", "Бесконечно", "Драгоценность",
-        "Сердце", "Любовь", "Уют", "Верность"
-      ];
       const count = 20 + Math.floor(Math.random() * 20);
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -232,7 +260,8 @@
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           life: 60 + Math.random() * 30,
-          word: goodWords[Math.floor(Math.random() * goodWords.length)],
+          // Используем те же характеристики для эффекта частиц
+          word: kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)],
           fontSize: 14 + Math.random() * 12,
           opacity: 1,
           isHeart: Math.random() < 0.5
@@ -268,12 +297,6 @@
         }
       }
     }
-    // Для примера: при клике на уже поднятом экране запускаем эффект частиц
-    app.addEventListener('click', (e) => {
-      if (stage === 3) {
-        createParticleExplosion(e.clientX, e.clientY);
-      }
-    });
     function animate() {
       updateParticles();
       requestAnimationFrame(animate);
@@ -290,6 +313,7 @@
       restartBtn.style.display = 'none';
       particles.length = 0;
       pctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      console.log("Перезапуск: возвращаемся к этапу 1");
     });
     // Показываем кнопку перезапуска через 5 секунд после появления пульсирующего сердца
     setTimeout(() => {

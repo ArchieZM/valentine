@@ -29,12 +29,14 @@
             font-family: 'Arial', sans-serif;
             color: white;
             z-index: 2;
+            transition: opacity 1s ease-in-out;
         }
         .small-text {
             font-size: 24px;
             font-family: 'Arial', sans-serif;
             color: rgba(255, 255, 255, 0.5);
             z-index: 1;
+            transition: opacity 1s ease-in-out;
         }
         .background {
             position: absolute;
@@ -46,14 +48,6 @@
             animation: background 10s infinite alternate;
             z-index: 0;
         }
-        .floating-words {
-            position: absolute;
-            font-size: 30px;
-            color: white;
-            opacity: 0.1;
-            animation: floatingWords 5s ease-in-out infinite;
-            z-index: 1;
-        }
         @keyframes background {
             0% {
                 background: linear-gradient(to bottom left, #ff66b2, #000000);
@@ -62,56 +56,76 @@
                 background: linear-gradient(to top right, #ff66b2, #000000);
             }
         }
-        @keyframes floatingWords {
-            0% {
-                opacity: 0.1;
-                transform: translateX(-100px) translateY(-100px);
-            }
-            50% {
-                opacity: 1;
-                transform: translateX(100px) translateY(100px);
-            }
-            100% {
-                opacity: 0.1;
-                transform: translateX(-100px) translateY(-100px);
-            }
-        }
-        #heart {
+        svg {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 200px;
             height: 200px;
-            border: 5px solid pink;
-            border-radius: 50%;
-            animation: heartPulse 1s infinite alternate;
-            display: none;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
         }
-        @keyframes heartPulse {
+        path {
+            fill: none;
+            stroke: pink;
+            stroke-width: 4;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawHeart 2s forwards, pulse 1s infinite alternate;
+        }
+        circle {
+            fill: pink;
+            opacity: 0;
+            animation: fadeIn 2s forwards, smallPulse 1s infinite alternate;
+        }
+        @keyframes drawHeart {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        @keyframes pulse {
             0% {
-                transform: translate(-50%, -50%) scale(1);
+                stroke-width: 4;
             }
             100% {
-                transform: translate(-50%, -50%) scale(1.1);
+                stroke-width: 6;
             }
         }
-        .particle {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: pink;
-            border-radius: 50%;
-            animation: particleAnimation 5s linear infinite;
-        }
-        @keyframes particleAnimation {
+        @keyframes smallPulse {
             0% {
-                transform: translateY(-100vh) rotate(0deg);
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.2);
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
                 opacity: 1;
             }
+        }
+        .hidden {
+            opacity: 0;
+        }
+        .floating-text {
+            position: absolute;
+            font-size: 16px;
+            color: white;
+            opacity: 0;
+            animation: floatAndFade 5s linear forwards;
+        }
+        @keyframes floatAndFade {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
             100% {
-                transform: translateY(100vh) rotate(360deg);
                 opacity: 0;
+                transform: translateY(-200px) rotate(360deg);
             }
         }
     </style>
@@ -119,52 +133,51 @@
 <body>
     <div class="container">
         <div class="background"></div>
-        <div class="floating-words" style="top: 10%; left: 20%;">Любимая</div>
-        <div class="floating-words" style="top: 20%; left: 30%;">Моя звезда</div>
-        <div class="floating-words" style="top: 30%; left: 50%;">Счастье</div>
         <div class="center-text">Люблю тебя ♥️</div>
         <div class="small-text">нажми</div>
-        <div id="heart"></div>
+        <svg id="heartSvg" viewBox="0 0 200 200">
+            <!-- Неоновое сердце -->
+            <path d="M100,150 C75,120 50,90 50,50 A50,50 0 0,1 150,50 C150,90 125,120 100,150 Z" />
+            <!-- Маленькое пульсирующее сердечко внутри -->
+            <circle cx="100" cy="100" r="10" />
+        </svg>
     </div>
-
-    <audio id="heartbeatSound" src="https://www.soundjay.com/button/sounds/beep-07.mp3"></audio>
 
     <script>
         let isHeartVisible = false;
 
-        // Создание частиц
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.animationDuration = Math.random() * 3 + 2 + 's';
-            document.body.appendChild(particle);
+        // Функция для создания летающего текста
+        function createFloatingText() {
+            const text = document.createElement('div');
+            text.classList.add('floating-text');
+            text.textContent = ['Люблю ❤️', 'Моя звезда ✨', 'Счастье 🌟'][Math.floor(Math.random() * 3)];
+            text.style.left = Math.random() * 100 + 'vw';
+            text.style.top = Math.random() * 100 + 'vh';
+            document.body.appendChild(text);
 
+            // Удаление текста после завершения анимации
             setTimeout(() => {
-                particle.remove();
+                text.remove();
             }, 5000);
         }
 
-        document.body.addEventListener('click', function() {
+        document.body.addEventListener('click', function () {
             if (!isHeartVisible) {
-                // Переход к следующему этапу
-                document.querySelector('.center-text').style.display = 'none';
-                document.querySelector('.small-text').style.display = 'none';
+                // Скрываем тексты
+                document.querySelector('.center-text').classList.add('hidden');
+                document.querySelector('.small-text').classList.add('hidden');
+
+                // Останавливаем фоновую анимацию
                 document.querySelector('.background').style.animation = 'none';
                 document.querySelector('.background').style.background = 'black';
-                document.getElementById('heart').style.display = 'block';
+
+                // Показываем SVG сердца
+                document.getElementById('heartSvg').style.opacity = 1;
+
                 isHeartVisible = true;
 
-                // Воспроизведение звука
-                const sound = document.getElementById('heartbeatSound');
-                sound.play();
-
-                setTimeout(() => {
-                    document.getElementById('heart').style.animation = 'heartPulse 1s infinite alternate';
-                }, 1000);
-
-                // Создание частиц
-                setInterval(createParticle, 200);
+                // Запускаем создание летающих текстов
+                setInterval(createFloatingText, 1000);
             }
         });
     </script>

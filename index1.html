@@ -1,272 +1,137 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Валентинка</title>
-  <style>
-    /* Основной фон с переливами (анимированный градиент) */
-    body, html {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      background: linear-gradient(45deg, #2a003a, #550055, #2a003a);
-      background-size: 400% 400%;
-      animation: gradientShift 8s ease infinite;
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    /* Начальный экран (фаза 0) */
-    #start-screen {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      text-align: center;
-      font-family: sans-serif;
-    }
-    #start-screen h1 {
-      font-size: 3em;
-      text-shadow: 0 0 10px rgba(255,105,180,0.8);
-      margin-bottom: 30px;
-    }
-    #start-btn {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1.5em;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-    /* При наведении кнопка немного увеличивается */
-    #start-btn:hover {
-      transform: scale(1.05);
-    }
-    /* Канвас на заднем плане */
-    canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Валентинка</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #ffb6c1, #000);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 1s ease-in-out;
+        }
+        .screen {
+            position: absolute;
+            text-align: center;
+            color: white;
+            font-size: 2em;
+        }
+        button {
+            background-color: #008CBA;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #005f73;
+        }
+        #heartCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <!-- Фаза 0: начальный экран -->
-  <div id="start-screen">
-    <h1>Я люблю тебя♥️</h1>
-    <button id="start-btn">Продолжить</button>
-  </div>
-  <!-- Канвас для последующих анимаций -->
-  <canvas id="canvas"></canvas>
+    <div id="stage1" class="screen">
+        <h1>Я люблю тебя ♥️</h1>
+        <button id="continueBtn">Продолжить</button>
+    </div>
+    <canvas id="heartCanvas"></canvas>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const continueBtn = document.getElementById("continueBtn");
+            const stage1 = document.getElementById("stage1");
+            const canvas = document.getElementById("heartCanvas");
+            const ctx = canvas.getContext("2d");
 
-  <script>
-    // Получение элементов
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const startScreen = document.getElementById('start-screen');
-    const startBtn = document.getElementById('start-btn');
-    
-    // Установка размеров canvas
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
 
-    // Определяем фазы анимации
-    // 0 – начальный экран, 1 – улетающие сердечки, 2 – сбор нитей в сердце, 3 – пульсация сердца
-    let phase = 0;
-    let phaseStartTime = null;
+            function resizeCanvas() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
 
-    // --- Фаза 1: сердечки, улетающие вверх ---
-    let phase1Duration = 1500; // длительность фазы 1 в мс
-    let phase1Hearts = [];
-    function initPhase1Hearts() {
-      phase1Hearts = [];
-      const count = 20;
-      for (let i = 0; i < count; i++) {
-        phase1Hearts.push({
-          x: Math.random() * canvas.width,
-          y: canvas.height + Math.random() * 100,
-          size: 20 + Math.random() * 20,
-          speed: 1 + Math.random() * 2
+            window.addEventListener("resize", resizeCanvas);
+
+            continueBtn.addEventListener("click", function () {
+                stage1.style.transition = "transform 1s ease-in-out, opacity 1s ease-in-out";
+                stage1.style.transform = "translateY(-100vh)";
+                stage1.style.opacity = "0";
+                setTimeout(() => {
+                    stage1.style.display = "none";
+                    canvas.style.display = "block";
+                    animateHeart();
+                }, 1000);
+            });
+
+            function animateHeart() {
+                let particles = [];
+                let heartSize = 50;
+
+                function Particle(x, y, vx, vy, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = vx;
+                    this.vy = vy;
+                    this.size = size;
+                    this.color = color;
+                }
+
+                Particle.prototype.update = function () {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.size *= 0.98;
+                };
+
+                Particle.prototype.draw = function () {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                };
+
+                function createHeartParticles() {
+                    for (let i = 0; i < 100; i++) {
+                        let angle = Math.random() * Math.PI * 2;
+                        let speed = Math.random() * 2 + 1;
+                        let x = width / 2;
+                        let y = height / 2;
+                        let vx = Math.cos(angle) * speed;
+                        let vy = Math.sin(angle) * speed;
+                        let size = Math.random() * 10 + 5;
+                        let color = "rgba(255, 105, 180, 0.8)";
+                        particles.push(new Particle(x, y, vx, vy, size, color));
+                    }
+                }
+
+                function drawHeart() {
+                    ctx.clearRect(0, 0, width, height);
+                    particles.forEach((particle, index) => {
+                        particle.update();
+                        particle.draw();
+                        if (particle.size < 0.5) particles.splice(index, 1);
+                    });
+                    requestAnimationFrame(drawHeart);
+                }
+
+                createHeartParticles();
+                drawHeart();
+            }
         });
-      }
-    }
-    function drawPhase1() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      phase1Hearts.forEach(heart => {
-        heart.y -= heart.speed;
-        drawHeart(heart.x, heart.y, heart.size);
-      });
-    }
-    // Функция рисования простого сердечка
-    function drawHeart(x, y, size) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.fillStyle = "pink";
-      ctx.beginPath();
-      const topCurveHeight = size * 0.3;
-      ctx.moveTo(0, topCurveHeight);
-      ctx.bezierCurveTo(0, 0, -size / 2, 0, -size / 2, topCurveHeight);
-      ctx.bezierCurveTo(-size / 2, size / 2, 0, size * 0.75, 0, size);
-      ctx.bezierCurveTo(0, size * 0.75, size / 2, size / 2, size / 2, topCurveHeight);
-      ctx.bezierCurveTo(size / 2, 0, 0, 0, 0, topCurveHeight);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // --- Фаза 2: частицы (нити) собираются в сердце ---
-    let phase2Duration = 4000; // длительность фазы 2 в мс
-    let particles = [];
-    const particleCount = 200;
-    function initParticles() {
-      particles = [];
-      for (let i = 0; i < particleCount; i++) {
-        // Начинаем с произвольной точки по периметру экрана
-        let edge = Math.floor(Math.random() * 4);
-        let x, y;
-        if (edge === 0) { x = 0; y = Math.random() * canvas.height; }
-        else if (edge === 1) { x = canvas.width; y = Math.random() * canvas.height; }
-        else if (edge === 2) { x = Math.random() * canvas.width; y = 0; }
-        else { x = Math.random() * canvas.width; y = canvas.height; }
-        particles.push({
-          x: x,
-          y: y,
-          // Для каждой частицы выбираем случайное значение параметра t для сердца
-          t: Math.random() * 2 * Math.PI
-        });
-      }
-    }
-    // Функция вычисления точки по параметрическому уравнению сердца
-    function heartCurve(t, scale) {
-      let x = scale * 16 * Math.pow(Math.sin(t), 3);
-      let y = -scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-      return { x, y };
-    }
-    function drawPhase2() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Вычисляем масштаб для сердца, зависящий от размеров окна
-      let scale = Math.min(canvas.width, canvas.height) / 80;
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      particles.forEach(p => {
-        // Целевая позиция по кривой сердца
-        const target = heartCurve(p.t, scale);
-        const targetX = cx + target.x;
-        const targetY = cy + target.y;
-        // Плавно интерполируем положение частицы к цели
-        p.x += (targetX - p.x) * 0.05;
-        p.y += (targetY - p.y) * 0.05;
-        // Рисуем частицу (ниточку)
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(255,105,180,0.8)";
-        ctx.shadowColor = "rgba(255,105,180,0.8)";
-        ctx.shadowBlur = 10;
-        ctx.fill();
-      });
-    }
-
-    // --- Фаза 3: сердце, пульсирующее (биение) ---
-    let pulseScale = 1;
-    let pulseDirection = 1;
-    function drawPhase3() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      let scale = Math.min(canvas.width, canvas.height) / 80;
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.scale(pulseScale, pulseScale);
-      ctx.beginPath();
-      for (let t = 0; t < 2 * Math.PI; t += 0.01) {
-        let point = heartCurve(t, scale);
-        if (t === 0) ctx.moveTo(point.x, point.y);
-        else ctx.lineTo(point.x, point.y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = "pink";
-      ctx.lineWidth = 2;
-      ctx.shadowColor = "pink";
-      ctx.shadowBlur = 20;
-      ctx.stroke();
-      ctx.restore();
-      // Обновляем коэффициент пульсации
-      if (pulseScale > 1.05) pulseDirection = -1;
-      if (pulseScale < 0.95) pulseDirection = 1;
-      pulseScale += pulseDirection * 0.005;
-    }
-
-    // --- Главная анимационная петля ---
-    // Фазы:
-    // phase = 0 – начальный экран (не обрабатываем через canvas)
-    // phase = 1 – улетающие сердечки (1)
-    // phase = 2 – сбор частиц в сердце (2)
-    // phase = 3 – пульсация сердца (3)
-    function animate(timestamp) {
-      if (phase === 1) {
-        // Фаза 1: сердечки улетают вверх
-        if (!phaseStartTime) phaseStartTime = timestamp;
-        const elapsed = timestamp - phaseStartTime;
-        drawPhase1();
-        if (elapsed < phase1Duration) {
-          requestAnimationFrame(animate);
-        } else {
-          // Переход к фазе 2
-          phase = 2;
-          phaseStartTime = timestamp;
-          initParticles();
-          requestAnimationFrame(animate);
-        }
-      } else if (phase === 2) {
-        // Фаза 2: частицы собираются в сердце
-        const elapsed = timestamp - phaseStartTime;
-        drawPhase2();
-        if (elapsed < phase2Duration) {
-          requestAnimationFrame(animate);
-        } else {
-          // Переход к фазе 3
-          phase = 3;
-          requestAnimationFrame(animate);
-        }
-      } else if (phase === 3) {
-        // Фаза 3: пульсация сердца
-        drawPhase3();
-        requestAnimationFrame(animate);
-      }
-    }
-
-    // --- Обработчик клика по кнопке "Продолжить" ---
-    startBtn.addEventListener('click', () => {
-      // Анимируем уход стартового экрана вверх
-      startScreen.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
-      startScreen.style.transform = "translateY(-100%)";
-      startScreen.style.opacity = "0";
-      setTimeout(() => {
-        startScreen.style.display = "none";
-        // Запускаем фазу 1
-        phase = 1;
-        phaseStartTime = null;
-        initPhase1Hearts();
-        requestAnimationFrame(animate);
-      }, 500);
-    });
-  </script>
+    </script>
 </body>
 </html>

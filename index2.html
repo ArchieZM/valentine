@@ -1,0 +1,202 @@
+<html lang="ru">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Валентинка для Киры</title>
+ <style>
+ body {
+ margin:0;
+ padding:0;
+ background: #1a1a1a;
+ color: #ff99cc;
+ font-family: 'Arial', sans-serif;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ min-height:100vh;
+ overflow: hidden;
+ }
+
+ #container {
+ position: relative;
+ width:100%;
+ max-width:600px;
+ padding:20px;
+ }
+
+ #message {
+ text-align: center;
+ font-size:2em;
+ margin-bottom:20px;
+ color: #ff99cc;
+ }
+
+ #continue-btn {
+ display: block;
+ margin:20px auto;
+ padding:10px20px;
+ background-color: #4dc3ff;
+ border: none;
+ border-radius:5px;
+ color: #fff;
+ font-size:1.2em;
+ cursor: pointer;
+ transition: transform0.3s ease;
+ }
+
+ #continue-btn:hover {
+ background-color: #1aa3ff;
+ }
+
+ #heart-canvas {
+ width:100%;
+ height:400px;
+ }
+
+ .background {
+ position: fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ background: linear-gradient(45deg, #ff99cc, #ff0066);
+ animation: gradientFlow5s ease infinite;
+ opacity:0.1;
+ z-index: -1;
+ }
+
+ @keyframes gradientFlow {
+0% { background-position:0%50%; }
+50% { background-position:100%50%; }
+100% { background-position:0%50%; }
+ }
+
+ .thread {
+ position: absolute;
+ width:2px;
+ height:50px;
+ background: #ff99cc;
+ transform-origin: bottom center;
+ animation: threadFlow1s ease-out forwards;
+ opacity:0.5;
+ }
+
+ @keyframes threadFlow {
+0% { transform: translateY(0) scaleY(1); opacity:0.5; }
+100% { transform: translateY(-100px) scaleY(0); opacity:0; }
+ }
+
+ .overlay {
+ position: fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ background: rgba(0,0,0,0);
+ animation: overlayFade2s ease-out forwards;
+ z-index:1000;
+ }
+
+ @keyframes overlayFade {
+0% { background: rgba(0,0,0,0); }
+100% { background: rgba(0,0,0,1); }
+ }
+
+ .heart {
+ position: absolute;
+ width:100px;
+ height:100px;
+ background: #ff99cc;
+ animation: heartPulse1s ease-in-out infinite;
+ transform: translate(-50%, -50%);
+ }
+
+ @keyframes heartPulse {
+0% { transform: translate(-50%, -50%) scale(1); }
+50% { transform: translate(-50%, -50%) scale(1.2); }
+100% { transform: translate(-50%, -50%) scale(1); }
+ }
+ </style>
+</head>
+<body>
+ <div class="background"></div>
+ <div id="container">
+ <div id="message">Я люблю тебя♥️</div>
+ <canvas id="heart-canvas"></canvas>
+ <button id="continue-btn">Продолжить</button>
+ </div>
+
+ <script>
+ const canvas = document.getElementById('heart-canvas');
+ const ctx = canvas.getContext('2d');
+ const messageElement = document.getElementById('message');
+ const continueButton = document.getElementById('continue-btn');
+ const container = document.getElementById('container');
+
+ canvas.width = window.innerWidth;
+ canvas.height = window.innerHeight *0.6;
+
+ let animationStarted = false;
+
+ continueButton.addEventListener('click', startAnimation);
+
+ function startAnimation() {
+ if (animationStarted) return;
+ animationStarted = true;
+
+ // Убрать кнопку continueButton.style.opacity = '0';
+ continueButton.style.transform = 'translateY(-100px)';
+ continueButton.style.transition = 'opacity0.5s ease, transform0.5s ease';
+
+ // Анимация фона document.querySelector('.background').style.animation = 'gradientFlowFast2s ease infinite';
+ document.querySelector('.background').style.opacity = '0.3';
+
+ // Создать сердца createHearts();
+
+ // Появить нити createThreads();
+
+ // Появить черный фон setTimeout(() => {
+ const overlay = document.createElement('div');
+ overlay.className = 'overlay';
+ document.body.appendChild(overlay);
+
+ // Создать пульсирующее сердце setTimeout(() => {
+ const heart = document.createElement('div');
+ heart.className = 'heart';
+ heart.style.left = '50%';
+ heart.style.top = '50%';
+ document.body.appendChild(heart);
+ },2000);
+ },1500);
+ }
+
+ function createHearts() {
+ for (let i =0; i <10; i++) {
+ const heart = document.createElement('div');
+ heart.className = 'heart';
+ heart.style.left = Math.random() *100 + '%';
+ heart.style.top = Math.random() *100 + '%';
+ document.body.appendChild(heart);
+ }
+ }
+
+ function createThreads() {
+ const corners = [
+ { x:0, y:0 },
+ { x:100, y:0 },
+ { x:100, y:100 },
+ { x:0, y:100 }
+ ];
+
+ corners.forEach((corner, index) => {
+ const thread = document.createElement('div');
+ thread.className = 'thread';
+ thread.style.left = corner.x + 'vw';
+ thread.style.top = corner.y + 'vh';
+ thread.style.animationDelay = index *0.2 + 's';
+ document.body.appendChild(thread);
+ });
+ }
+ </script>
+</body>
+</html>

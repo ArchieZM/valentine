@@ -1,136 +1,29 @@
-/* styles.css */
-
-/* Сброс отступов и установка базовых параметров */
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 200vh; /* Увеличенная высота, чтобы нижняя часть оставалась скрытой */
-    overflow-x: hidden;
-    font-family: 'Arial', sans-serif;
-    background: #000; /* Основной фон – черный */
-}
-
-/* Контейнер фона, который фиксируется и служит основой для анимаций */
-#background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-/* Правый верхний угол: плавно переливающиеся оттенки розового */
-#background::before {
-    content: "";
+.heart-animation {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 40%;
-    height: 40%;
-    background: linear-gradient(45deg, #ff9a9e, #fad0c4);
-    animation: pinkShift 20s infinite alternate;
-}
-
-@keyframes pinkShift {
-    from { filter: hue-rotate(0deg); }
-    to { filter: hue-rotate(45deg); }
-}
-
-/* Центральная область: градиент, где розовый смешивается с черным */
-#background::after {
-    content: "";
-    position: absolute;
-    top: 25%;
-    left: 25%;
-    width: 50%;
-    height: 50%;
-    background: linear-gradient(135deg, rgba(255, 105, 180, 0.8), rgba(0, 0, 0, 0.8));
-    mix-blend-mode: overlay;
-}
-
-/* Нижний левый угол: полностью черный фон, продолжающийся вниз */
-#background .lower-left {
-    position: absolute;
-    bottom: -100vh;
-    left: 0;
-    width: 50%;
-    height: 100vh;
-    background: #000;
-}
-
-/* Стили для плавающих слов и сердечек (создаются через JS) */
-.floating-word, .floating-heart {
-    position: absolute;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1em;
-    pointer-events: none;
-    animation: floatAndFade 5s ease-in-out forwards;
-}
-
-@keyframes floatAndFade {
-    0% { opacity: 0; transform: translate(0, 0); }
-    50% { opacity: 1; }
-    100% { opacity: 0; transform: translate(0, -50px); }
-}
-
-/* Эффект сдвига фона вверх при клике */
-.shift-up {
-    animation: shiftUp 2s forwards;
-}
-
-@keyframes shiftUp {
-    from { transform: translateY(0); }
-    to { transform: translateY(-100px); }
-}
-
-/* Контейнер для SVG-анимации сердца */
-#heart-container {
-    position: fixed;
     top: 50%;
     left: 50%;
+    width: 100px;
+    height: 100px;
+    background: url('heart.svg') no-repeat center/contain;
     transform: translate(-50%, -50%);
-    z-index: 10;
+    animation: heartbeat 1s infinite;
 }
 
-/* Стили для неонового контура сердца (анимация рисования линии) */
-.neon-heart {
-    stroke: #ff69b4;
-    stroke-width: 2;
-    fill: transparent;
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: drawHeart 2s forwards;
-}
-
-@keyframes drawHeart {
-    to { stroke-dashoffset: 0; }
-}
-
-/* Пульсирующая анимация для сердца внутри контура */
-.pulsing-heart {
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
+@keyframes heartbeat {
     0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
 
-/* Эффект взрыва: частицы, вылетающие из точки клика */
-.particle {
+.explosion {
     position: absolute;
-    background: #ff69b4;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    opacity: 0.8;
-    pointer-events: none;
-    animation: particleBurst 1s forwards;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, #ff4d4d, transparent);
+    animation: explode 1s ease-out;
 }
 
-@keyframes particleBurst {
-    0% { transform: translate(0, 0); opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
 }

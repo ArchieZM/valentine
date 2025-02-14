@@ -3,324 +3,304 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Валентинка</title>
+  <title>Валентинка для Киры</title>
+  <!-- Подключаем шрифт Lobster для надписей -->
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
   <style>
-    /* Общие стили */
-    * {
-      box-sizing: border-box;
+    /* Исходный фон – яркий розовый градиент */
+    body {
       margin: 0;
-      padding: 0;
-    }
-    html, body {
-      height: 100%;
       overflow: hidden;
-      font-family: 'Arial', sans-serif;
-      /* Фон body – чёрный, чтобы после анимации был чёрный фон */
-      background: #000;
-    }
-    /* Контейнер приложения, который будет анимироваться */
-    #app {
       position: relative;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      color: #fff;
-      user-select: none;
-      cursor: pointer;
-      overflow: hidden;
-      transition: transform 1.5s ease-in-out;
-      z-index: 1;
+      height: 100vh;
+      background: linear-gradient(120deg, #ff9a9e, #fad0c4);
+      transition: background 2s ease-in-out;
     }
-    /* Начальный фон – указанная SVG-картинка */
-    #initialBg {
+
+    /* Эффект затемнения по краям экрана */
+    .vignette {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: url("https://xmple.com/wallpaper/gradient-purple-linear-black-2880x5120-c2-ff00ff-000000-a-90-f-14.svg") no-repeat center center;
-      background-size: cover;
-      z-index: -1;
-      transition: transform 1.5s ease-in-out;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(0, 0, 0, 0) 80%, rgba(139, 0, 139, 0.8) 100%);
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+      z-index: 9;
     }
-    /* Основной текст – сделан более заметным */
-    #mainText {
+
+    /* Стартовый экран с приветственным текстом и кнопкой */
+    .start-screen {
       position: absolute;
-      top: 38%;
       width: 100%;
-      font-size: 60px;
-      font-weight: 900;
-      z-index: 2;
-      text-shadow: 4px 4px 8px #000;
-      opacity: 1;
-      transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
-      animation: pulseText 2s infinite alternate;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.5s ease;
     }
-    @keyframes pulseText {
-      from { text-shadow: 4px 4px 8px #000; }
-      to { text-shadow: 8px 8px 16px #ff00ff; }
+
+    #welcomeMessage {
+      font-family: 'Lobster', cursive;
+      font-size: 36px;
+      color: #fff;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+      margin-bottom: 20px;
     }
-    /* Подсказка "нажми" – сделана почти незаметной */
-    #hint {
+
+    .start-button {
+      background: linear-gradient(45deg, #ff4e50, #f9d423);
+      border: none;
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .start-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Маленькие сердечки на стартовом экране */
+    .heart {
       position: absolute;
-      top: 50%;
+      width: 30px; /* Увеличен размер */
+      height: 30px;
+      opacity: 0.3;
+      animation: float-up 10s linear infinite;
+    }
+
+    .heart svg {
       width: 100%;
-      font-size: 14px;
-      font-weight: normal;
-      opacity: 0.1;
-      z-index: 2;
-      transition: transform 1.5s ease-in-out, opacity 1.5s ease-in-out;
-      /* Убираем анимацию мерцания, чтобы текст оставался едва заметным */
+      height: 100%;
+      fill: #ff69b4;
     }
-    /* Кнопка перезапуска */
-    #restartBtn {
+
+    @keyframes float-up {
+      0% {
+        transform: translateY(100vh);
+      }
+      100% {
+        transform: translateY(-100vh);
+      }
+    }
+
+    /* Canvas для отрисовки основного сердца */
+    canvas {
       position: absolute;
-      bottom: 20px;
+      top: -10%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Текст, выводимый над нарисованным сердцем */
+    #heartText {
+      position: absolute;
+      top: 12%; /* Сдвинуто выше */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Lobster', cursive;
+      font-size: 32px;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.9);
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      z-index: 11;
+    }
+
+    /* Романтический текст внизу экрана */
+    #romanticText {
+      position: absolute;
+      bottom: 12%; /* Остался на месте */
       left: 50%;
       transform: translateX(-50%);
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #28a745;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 10;
-      display: none;
+      font-family: 'Lobster', cursive;
+      font-size: 32px;
+      color: #fff;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: opacity 2s ease;
+      z-index: 11;
     }
-    /* Стили для SVG неонового сердца (Этап 3) */
-    #neonHeart {
+
+    /* Маленькое бьющееся сердечко внутри основного сердца */
+    #innerHeart {
       position: absolute;
-      top: 50%;
       left: 50%;
+      top: 50%; /* Центр относительно экрана */
       transform: translate(-50%, -50%);
-      z-index: 4;
-      display: none;
+      z-index: 12
+      z-index: 12;
+      opacity: 0;
+      width: 100px; /* Увеличен размер */
+      height: 100px;
     }
-    /* Стили для пульсирующего сердца внутри контура (Этап 4) */
-    #pulsingHeart {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, #ff69b4 40%, transparent 70%);
-      border-radius: 50%;
-      box-shadow: 0 0 20px rgba(255,105,180,0.8);
-      z-index: 5;
-      display: none;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.1); }
-      100% { transform: translate(-50%, -50%) scale(1); }
-    }
-    /* Canvas для эффекта частиц (Этап 5) */
-    #particleCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
+
+    #innerHeart svg {
       width: 100%;
       height: 100%;
-      z-index: 6;
-      pointer-events: none;
+      fill: #ff69b4;
+      filter: drop-shadow(0 0 10px #ff69b4);
+      animation: beat 1s infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <!-- Начальный фон -->
-    <div id="initialBg"></div>
+  <!-- Эффект затемнения по краям -->
+  <div class="vignette" id="vignette"></div>
 
-    <!-- Основной текст -->
-    <div id="mainText">Люблю тебя♥️</div>
-    <!-- Подсказка (почти незаметная) -->
-    <div id="hint">нажми</div>
+  <!-- Стартовый экран с приветственным текстом и кнопкой -->
+  <div class="start-screen" id="startScreen">
+    <div id="welcomeMessage">С днем Валентина!♥️</div>
+    <button class="start-button" id="startButton" onclick="startAnimation()">Нажми на меня</button>
+  </div>
 
-    <!-- SVG неонового сердца (Этап 3) -->
-    <div id="neonHeart">
-      <svg viewBox="0 0 200 200" width="200" height="200">
-        <path id="heartPath" d="M100,30 C70,50 50,80 50,120 A50,50 0 0,0 150,120 C150,80 130,50 100,30 Z"
-              fill="none"
-              stroke="#ff69b4"
-              stroke-width="4"
-              stroke-linecap="round"
-              stroke-dasharray="628"
-              stroke-dashoffset="628">
-          <animate attributeName="stroke-dashoffset"
-                   from="628" to="0"
-                   dur="2s"
-                   fill="freeze" />
-          <animate attributeName="stroke-dasharray"
-                   from="0 628" to="628 0"
-                   dur="2s"
-                   fill="freeze" />
-        </path>
-      </svg>
-      <style>
-        #heartPath {
-          filter: drop-shadow(0 0 10px #ff69b4) drop-shadow(0 0 20px #ff69b4) drop-shadow(0 0 30px #ff69b4);
-        }
-      </style>
-    </div>
+  <!-- Маленькие сердечки на стартовом экране -->
+  <script>
+    // Создаем множество сердечек
+    function createHearts() {
+      const heartCount = 0; // Количество сердечек
+      for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = `${Math.random() * 100}%`;
+        heart.style.animationDelay = `${Math.random() * 10}s`;
+        heart.innerHTML = `
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+        `;
+        document.body.appendChild(heart);
+      }
+    }
 
-    <!-- Пульсирующее сердце внутри неонового контура (Этап 4) -->
-    <div id="pulsingHeart"></div>
+    // Удаляем сердечки при нажатии на кнопку
+    function removeHearts() {
+      const hearts = document.querySelectorAll('.heart');
+      hearts.forEach(heart => heart.remove());
+    }
 
-    <!-- Canvas для эффекта частиц (Этап 5) -->
-    <canvas id="particleCanvas"></canvas>
+    // Создаем сердечки сразу при загрузке страницы
+    createHearts();
+  </script>
 
-    <!-- Кнопка перезапуска -->
-    <button id="restartBtn">Начать сначала</button>
+  <!-- Canvas для отрисовки основного сердца -->
+  <canvas id="heartCanvas"></canvas>
+
+  <!-- Текст "я люблю тебя" (выводится в верхней части основного сердца) -->
+  <div id="heartText">Я люблю тебя!</div>
+
+  <!-- Романтический текст внизу экрана -->
+  <div id="romanticText">Кира, ты самая лучшая!</div>
+
+  <!-- Маленькое бьющееся сердечко внутри основного сердца -->
+  <div id="innerHeart">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </svg>
   </div>
 
   <script>
-    /* ===== Настройки и переменные ===== */
-    const app = document.getElementById('app');
-    const initialBg = document.getElementById('initialBg');
-    const mainText = document.getElementById('mainText');
-    const hint = document.getElementById('hint');
-    const neonHeart = document.getElementById('neonHeart');
-    const pulsingHeart = document.getElementById('pulsingHeart');
-    const restartBtn = document.getElementById('restartBtn');
-    const particleCanvas = document.getElementById('particleCanvas');
-    const pctx = particleCanvas.getContext('2d');
+    let started = false;
 
-    let canvasWidth = window.innerWidth;
-    let canvasHeight = window.innerHeight;
-    particleCanvas.width = canvasWidth;
-    particleCanvas.height = canvasHeight;
+    function startAnimation() {
+      if (started) return;
+      started = true;
 
-    // Этапы:
-    // stage = 1 – начальный экран (фон, текст, подсказка)
-    // stage = 2 – анимация подъёма (фон, текст и подсказка уходят вверх)
-    // stage = 3 – отображается неоновое сердце и пульсирующее сердце (после чего клики запускают эффект частиц)
-    let stage = 1;
-    console.log("Начальный этап: stage =", stage);
+      // Удаляем сердечки на фоне
+      removeHearts();
 
-    /* ===== Список характеристик для Киры ===== */
-    const kiraAttributes = [
-      "Любимая", "Моя звезда", "Нежная", "Очаровательная", "Уникальная",
-      "Мечта", "Свет моей жизни", "Драгоценность", "Радость", "Сердце"
-    ];
+      // Показываем эффект затемнения по краям
+      const vignette = document.getElementById("vignette");
+      vignette.style.opacity = "1";
 
-    /* ===== Эффект плавающих элементов (используем характеристики Киры) ===== */
-    // Массив для плавающих элементов
-    const floatingItems = [];
-    // Функция создания случайного плавающего элемента
-    function spawnFloatingItem() {
-      let text = kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)];
-      floatingItems.push({
-        text: text,
-        x: Math.random() * canvasWidth,
-        y: canvasHeight + Math.random() * 50,
-        speed: 0.5 + Math.random(), // немного быстрее
-        opacity: 0,
-        life: 0,
-        maxLife: 200 + Math.random() * 150,
-        fontSize: 28 + Math.random() * 10  // увеличенный шрифт для заметности
-      });
+      // Скрываем стартовый экран
+      const startScreen = document.getElementById("startScreen");
+      startScreen.style.opacity = "0";
+      setTimeout(() => {
+        startScreen.style.display = "none";
+      }, 1);
+
+      // Плавный переход фона в новый фон: в центре чёрный, по краям темно-розовые оттенки
+      document.body.style.background = "radial-gradient(circle, #000 90%, #8B008B)";
+
+      // Запускаем отрисовку сердца через небольшую задержку
+      setTimeout(drawHeart, 1500);
     }
-    // Запускаем спаун каждые 400 мс
-    setInterval(spawnFloatingItem, 400);
-    // Отрисовка плавающих элементов на дополнительном canvas можно добавить по желанию
 
-    /* ===== Переход: при клике на экран весь контейнер поднимается вверх ===== */
-    app.addEventListener('click', (event) => {
-      if (stage === 1) {
-        console.log("Клик на этапе 1. Запуск анимации подъёма...");
-        app.style.transform = `translateY(-${canvasHeight}px)`;
-        initialBg.style.transform = `translateY(-${canvasHeight}px)`;
-        setTimeout(() => {
-          stage = 2;
-          console.log("Этап 2: контейнер поднят. Отображаем неоновое сердце...");
-          neonHeart.style.display = 'block';
-          setTimeout(() => {
-            pulsingHeart.style.display = 'block';
-            stage = 3;
-            console.log("Этап 3: неоновое и пульсирующее сердце отображены. Теперь клики запускают эффект частиц.");
-          }, 2200);
-        }, 1500);
-      } else if (stage === 3) {
-        createParticleExplosion(event.clientX, event.clientY);
-      }
-    });
+    function drawHeart() {
+      const canvas = document.getElementById("heartCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-    /* ===== Эффект частиц (Этап 3/4) ===== */
-    const particles = [];
-    function createParticleExplosion(x, y) {
-      const count = 20 + Math.floor(Math.random() * 20);
-      for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 3 + 1;
-        particles.push({
-          x: x,
-          y: y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 60 + Math.random() * 30,
-          // Используем те же характеристики для эффекта частиц
-          word: kiraAttributes[Math.floor(Math.random() * kiraAttributes.length)],
-          fontSize: 14 + Math.random() * 12,
-          opacity: 1,
-          isHeart: Math.random() < 0.5
-        });
-      }
-    }
-    function updateParticles() {
-      pctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        p.opacity = p.life / 90;
-        if (p.isHeart) {
-          pctx.save();
-          pctx.translate(p.x, p.y);
-          pctx.scale(0.03 * p.fontSize, 0.03 * p.fontSize);
-          pctx.beginPath();
-          pctx.moveTo(0, -30);
-          pctx.bezierCurveTo(30, -70, 70, -20, 0, 30);
-          pctx.bezierCurveTo(-70, -20, -30, -70, 0, -30);
-          pctx.fillStyle = `rgba(255,105,180,${p.opacity})`;
-          pctx.fill();
-          pctx.restore();
-        } else {
-          pctx.font = `${p.fontSize}px Arial`;
-          pctx.fillStyle = `rgba(255,255,255,${p.opacity})`;
-          pctx.fillText(p.word, p.x, p.y);
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2 + 50;
+      let t = Math.PI;
+      const scale = 11; // уменьшенный масштаб
+
+      function animateHeart() {
+        if (t > Math.PI * 2 + Math.PI) {
+          // Когда сердце полностью нарисовано, показываем надписи и внутреннее сердце
+          document.getElementById("heartText").style.opacity = "1";
+          document.getElementById("romanticText").style.opacity = "1";
+          document.getElementById("innerHeart").style.opacity = "1";
+
+          // Корректируем позицию внутреннего сердечка
+          const innerHeart = document.getElementById("innerHeart");
+          innerHeart.style.top = `${centreY}px`; // Центр по вертикали
+          innerHeart.style.left = `${centerX}px`; // Центр по горизонтали
+          innerHeart.style.transform = `translate(-50%, -50%)`;
+
+          return;
         }
-        if (p.life <= 0) {
-          particles.splice(i, 1);
-        }
-      }
-    }
-    function animate() {
-      updateParticles();
-      requestAnimationFrame(animate);
-    }
-    animate();
 
-    /* ===== Обработка кнопки перезапуска ===== */
-    restartBtn.addEventListener('click', () => {
-      stage = 1;
-      app.style.transform = 'translateY(0)';
-      initialBg.style.transform = 'translateY(0)';
-      neonHeart.style.display = 'none';
-      pulsingHeart.style.display = 'none';
-      restartBtn.style.display = 'none';
-      particles.length = 0;
-      pctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      console.log("Перезапуск: возвращаемся к этапу 1");
-    });
-    // Показываем кнопку перезапуска через 5 секунд после появления пульсирующего сердца
-    setTimeout(() => {
-      if (stage === 3) {
-        restartBtn.style.display = 'block';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(255, 105, 180, 0.9)";
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = "rgba(255, 105, 180, 1)";
+        ctx.beginPath();
+
+        for (let i = Math.PI; i <= t; i += 0.015) {
+          let x = 16 * Math.pow(Math.sin(i), 3);
+          let y = 13 * Math.cos(i) - 5 * Math.cos(2 * i) - 2 * Math.cos(3 * i) - Math.cos(4 * i);
+          if (i === Math.PI) {
+            ctx.moveTo(centerX + x * scale, centerY - y * scale);
+          } else {
+            ctx.lineTo(centerX + x * scale, centerY - y * scale);
+          }
+        }
+
+        ctx.stroke();
+
+        // Добавляем границу для сердца
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.stroke();
+
+        t += 0.015;
+        requestAnimationFrame(animateHeart);
       }
-    }, 5000);
+      animateHeart();
+    }
   </script>
 </body>
 </html>

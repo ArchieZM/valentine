@@ -2,14 +2,13 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Сердечко для тебя</title>
+  <title>Для Киры ❤️</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Marck+Script&display=swap');
     
     body {
-      background: radial-gradient(circle at center, #1a0000 0%, #000 100%);
+      background: #111;
       font-family: 'Marck Script', cursive;
-      text-align: center;
       margin: 0;
       padding: 0;
       height: 100vh;
@@ -20,6 +19,160 @@
       perspective: 1000px;
     }
     
+    /* Конверт - полная версия */
+    .envelope-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+      animation: envelopeContainerDisappear 0.5s forwards 2.5s;
+    }
+    
+    .envelope {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+      border-radius: 8px;
+      transform-style: preserve-3d;
+      box-shadow: 
+        0 10px 25px rgba(0,0,0,0.3),
+        0 0 0 1px rgba(255,255,255,0.1),
+        inset 0 -5px 10px rgba(0,0,0,0.2),
+        inset 0 5px 10px rgba(255,255,255,0.1);
+      animation: envelopeFloat 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+    
+    .envelope:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-top: 80px solid #b71c1c;
+      transform-origin: top;
+      transform: rotateX(0deg);
+      z-index: 2;
+      filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.3));
+      animation: envelopeFlapOpen 2.5s ease-in-out forwards;
+    }
+    
+    .envelope:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 10px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 0 0 8px 8px;
+    }
+    
+    .envelope-paper {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      background: linear-gradient(to bottom, #f5f5f5 0%, #e0e0e0 100%);
+      border-radius: 3px;
+      z-index: 1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transform: translateY(0);
+      animation: paperPeek 2s ease-in-out forwards 1.5s;
+    }
+    
+    .envelope-stamp {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 40px;
+      height: 50px;
+      background: #ffeb3b;
+      border-radius: 3px;
+      z-index: 3;
+      transform: rotate(5deg);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: #c62828;
+      animation: stampWobble 0.5s ease-in-out infinite alternate;
+    }
+    
+    .envelope-shadow {
+      position: absolute;
+      width: 320px;
+      height: 30px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      filter: blur(5px);
+      animation: shadowFade 2.5s ease-in-out forwards;
+    }
+    
+    .envelope-glitter {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.8) 0%, transparent 3%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.8) 0%, transparent 4%),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.8) 0%, transparent 5%);
+      opacity: 0;
+      animation: glitterShow 1s ease-in forwards 1s;
+    }
+    
+    /* Анимации конверта */
+    @keyframes envelopeFloat {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+    
+    @keyframes envelopeFlapOpen {
+      0% { transform: rotateX(0deg); }
+      40% { transform: rotateX(160deg); }
+      60% { transform: rotateX(160deg); }
+      80% { transform: rotateX(160deg) translateY(-20px); }
+      100% { transform: rotateX(160deg) translateY(-200px); opacity: 0; }
+    }
+    
+    @keyframes paperPeek {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-50px); }
+      100% { transform: translateY(-200px); opacity: 0; }
+    }
+    
+    @keyframes shadowFade {
+      0% { opacity: 1; transform: translateX(-50%) scale(0.8); }
+      70% { opacity: 1; transform: translateX(-50%) scale(0.8); }
+      100% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+    }
+    
+    @keyframes stampWobble {
+      to { transform: rotate(8deg); }
+    }
+    
+    @keyframes glitterShow {
+      to { opacity: 0.3; }
+    }
+    
+    @keyframes envelopeContainerDisappear {
+      to { opacity: 0; pointer-events: none; display: none; }
+    }
+    
+    /* Стили открытки */
     .card {
       position: relative;
       background: rgba(20, 0, 0, 0.7);
@@ -28,10 +181,10 @@
       box-shadow: 0 0 20px rgba(255, 50, 50, 0.2);
       backdrop-filter: blur(8px);
       transform-style: preserve-3d;
-      transform: rotateY(5deg);
-      transition: all 1.2s cubic-bezier(0.17, 0.67, 0.21, 0.99);
+      transform: rotateY(5deg) scale(0);
       opacity: 0;
-      animation: cardAppear 2s forwards 0.5s;
+      animation: cardAppear 2s forwards 3s;
+      z-index: 50;
     }
     
     .text {
@@ -52,21 +205,70 @@
       height: 320px;
       margin: 30px auto;
       transform: scale(0.9);
+      animation: containerBreath 8s infinite ease-in-out 5s;
     }
     
-    #backgroundCanvas, #heartCanvas {
+    #backgroundCanvas, #heartCanvas, #effectsCanvas {
       position: absolute;
       top: 0;
       left: 0;
     }
     
+    /* Визуальные дополнения */
+    .rose {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      z-index: -1;
+      animation: roseAppear 2s forwards var(--delay);
+    }
+    
+    .star {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle 5s infinite var(--delay);
+    }
+    
+    .petal {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      z-index: -1;
+      animation: floatPetal 15s linear forwards;
+    }
+    
+    /* Анимации */
     @keyframes cardAppear {
-      from { opacity: 0; transform: rotateY(15deg) translateY(50px); }
-      to { opacity: 1; transform: rotateY(5deg) translateY(0); }
+      0% { opacity: 0; transform: rotateY(15deg) translateY(50px) scale(0); }
+      100% { opacity: 1; transform: rotateY(5deg) translateY(0) scale(1); }
     }
     
     @keyframes textAppear {
-      to { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0) rotateZ(var(--rotation, 0deg)); }
+    }
+    
+    @keyframes containerBreath {
+      0%, 100% { transform: scale(0.98); }
+      50% { transform: scale(1.02); }
+    }
+    
+    @keyframes roseAppear {
+      to { opacity: 0.15; }
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.8; }
+    }
+    
+    @keyframes floatPetal {
+      0% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
+      100% { transform: translate(var(--tx), var(--ty)) rotate(360deg); opacity: 0; }
     }
     
     @keyframes heartBeat {
@@ -79,13 +281,36 @@
   </style>
 </head>
 <body>
+  <!-- Конверт -->
+  <div class="envelope-container">
+    <div class="envelope">
+      <div class="envelope-paper"></div>
+      <div class="envelope-stamp">К</div>
+      <div class="envelope-glitter"></div>
+    </div>
+    <div class="envelope-shadow"></div>
+  </div>
+  
+  <!-- Визуальные элементы -->
+  <div class="rose" style="top:10%;left:5%;--delay:4s">🌹</div>
+  <div class="rose" style="top:10%;right:5%;--delay:4.2s">🌹</div>
+  <div class="rose" style="bottom:10%;left:5%;--delay:4.4s">🌹</div>
+  <div class="rose" style="bottom:10%;right:5%;--delay:4.6s">🌹</div>
+  
+  <div class="star" style="top:15%;left:20%;--delay:3s"></div>
+  <div class="star" style="top:25%;left:80%;--delay:3.5s"></div>
+  <div class="star" style="top:80%;left:30%;--delay:4s"></div>
+  <div class="star" style="top:70%;left:70%;--delay:4.5s"></div>
+  
+  <!-- Основная открытка -->
   <div class="card">
-    <p class="text top" style="--delay: 1.5s">Ты наполнил</p>
+    <p class="text top" style="--delay:4s;--rotation:-1deg">Ты заполнила</p>
     <div class="canvas-container">
       <canvas id="backgroundCanvas" width="320" height="320"></canvas>
       <canvas id="heartCanvas" width="320" height="320"></canvas>
+      <canvas id="effectsCanvas" width="320" height="320"></canvas>
     </div>
-    <p class="text bottom" style="--delay: 2s">моё сердце теплом</p>
+    <p class="text bottom" style="--delay:4.5s;--rotation:0.5deg">моё сердце теплом</p>
   </div>
 
   <script>
@@ -94,11 +319,13 @@
     const bgCtx = bgCanvas.getContext('2d');
     const heartCanvas = document.getElementById('heartCanvas');
     const heartCtx = heartCanvas.getContext('2d');
+    const effectsCanvas = document.getElementById('effectsCanvas');
+    const effectsCtx = effectsCanvas.getContext('2d');
     const centerX = heartCanvas.width / 2;
     const centerY = heartCanvas.height / 2;
     const points = [];
     
-    // Функция формы сердца
+    // Форма сердца
     function heartShape(t) {
       const x = 16 * Math.pow(Math.sin(t), 3);
       const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
@@ -111,15 +338,15 @@
       points.push(heartShape(angle));
     }
     
-    // Переменные анимации
+    // Анимация
     let drawnLines = 0;
     const totalLines = 800;
     let fillProgress = 0;
-    const fillSpeed = 0.005; // Увеличена скорость заполнения
+    const fillSpeed = 0.005;
     let lastFrameTime = 0;
     const frameInterval = 1000 / 60;
     
-    // Функция рисования линий
+    // Рисование линий
     function drawLine(timestamp) {
       if (!lastFrameTime) lastFrameTime = timestamp;
       const elapsed = timestamp - lastFrameTime;
@@ -140,9 +367,14 @@
           bgCtx.strokeStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
           bgCtx.lineWidth = 0.3 + progress * 1.5;
           
+          // Неровности линий
+          const roughness = (1 - progress) * 2;
+          const offsetX = (Math.random() - 0.5) * roughness;
+          const offsetY = (Math.random() - 0.5) * roughness;
+          
           bgCtx.beginPath();
-          bgCtx.moveTo(points[i][0], points[i][1]);
-          bgCtx.lineTo(points[j][0], points[j][1]);
+          bgCtx.moveTo(points[i][0] + offsetX, points[i][1] + offsetY);
+          bgCtx.lineTo(points[j][0] + offsetX, points[j][1] + offsetY);
           bgCtx.stroke();
           
           drawnLines++;
@@ -153,10 +385,11 @@
         requestAnimationFrame(drawLine);
       } else {
         startHeartBeat();
+        addFinalEffects();
       }
     }
     
-    // Анимация заполнения сердца (без замедления)
+    // Заполнение сердца
     function animateFill(timestamp) {
       fillProgress = Math.min(fillProgress + fillSpeed, 1);
       
@@ -189,24 +422,24 @@
       }
     }
     
-    // Яркая и быстрая пульсация сердца
+    // Пульсация сердца
     function startHeartBeat() {
-      heartCanvas.style.animation = "heartBeat 1.2s infinite ease-in-out";
+      heartCanvas.style.animation = "heartBeat 0.8s infinite ease-in-out";
       
-      // Добавляем внутреннее свечение при пульсации
-      function pulseGlow(timestamp) {
+      // Внутреннее свечение
+      function pulseGlow() {
         const scale = parseFloat(getComputedStyle(heartCanvas).transform.split(',')[3] || 1);
         const glowIntensity = (scale - 1) * 20;
         
-        heartCtx.globalCompositeOperation = "source-over";
-        heartCtx.fillStyle = `rgba(255, 100, 100, ${glowIntensity * 0.03})`;
-        heartCtx.beginPath();
+        effectsCtx.clearRect(0, 0, effectsCanvas.width, effectsCanvas.height);
+        effectsCtx.fillStyle = `rgba(255, 100, 100, ${glowIntensity * 0.03})`;
+        effectsCtx.beginPath();
         for (let i = 0; i < points.length; i++) {
-          if (i === 0) heartCtx.moveTo(points[i][0], points[i][1]);
-          else heartCtx.lineTo(points[i][0], points[i][1]);
+          if (i === 0) effectsCtx.moveTo(points[i][0], points[i][1]);
+          else effectsCtx.lineTo(points[i][0], points[i][1]);
         }
-        heartCtx.closePath();
-        heartCtx.fill();
+        effectsCtx.closePath();
+        effectsCtx.fill();
         
         requestAnimationFrame(pulseGlow);
       }
@@ -214,20 +447,72 @@
       pulseGlow();
     }
     
+    // Дополнительные эффекты
+    function addFinalEffects() {
+      // Лепестки
+      for (let i = 0; i < 15; i++) {
+        createPetal();
+      }
+      
+      // Секретное сообщение
+      const secretMsg = document.createElement('div');
+      secretMsg.innerHTML = 'Кира, спасибо за твоё тепло! ❤️';
+      secretMsg.style.position = 'absolute';
+      secretMsg.style.bottom = '20px';
+      secretMsg.style.width = '100%';
+      secretMsg.style.textAlign = 'center';
+      secretMsg.style.color = 'rgba(255,255,255,0)';
+      secretMsg.style.transition = 'color 1s';
+      secretMsg.style.fontSize = '18px';
+      document.querySelector('.card').appendChild(secretMsg);
+      
+      heartCanvas.addEventListener('click', () => {
+        secretMsg.style.color = 'rgba(255,255,255,0.8)';
+        setTimeout(() => secretMsg.style.color = 'rgba(255,255,255,0)', 3000);
+      });
+    }
+    
+    // Создание лепестков
+    function createPetal() {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.innerHTML = '🌸';
+      petal.style.left = Math.random() * 100 + '%';
+      petal.style.top = Math.random() * 100 + '%';
+      petal.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+      petal.style.setProperty('--ty', Math.random() * 200 + 100 + 'px');
+      petal.style.fontSize = (Math.random() * 20 + 10) + 'px';
+      petal.style.animationDelay = (Math.random() * 2) + 's';
+      document.body.appendChild(petal);
+      
+      setTimeout(() => {
+        petal.style.opacity = '0.7';
+      }, 100);
+    }
+    
+    // Звук открытия конверта
+    function playEnvelopeSound() {
+      const audio = new Audio();
+      audio.src = 'https://assets.mixkit.co/sfx/preview/mixkit-page-turn-single-1106.mp3';
+      audio.volume = 0.3;
+      audio.play().catch(e => console.log('Автовоспроизведение запрещено'));
+    }
+    
     // Инициализация
     function init() {
       // Настройка canvas
       bgCtx.globalCompositeOperation = 'source-over';
       heartCtx.globalCompositeOperation = 'source-over';
+      effectsCtx.globalCompositeOperation = 'source-over';
       
-      // Начало анимаций
+      // Запуск анимаций
+      setTimeout(playEnvelopeSound, 800);
       setTimeout(() => {
         requestAnimationFrame(drawLine);
         requestAnimationFrame(animateFill);
-      }, 1500);
+      }, 3500);
     }
     
-    // Запуск
     window.addEventListener('load', init);
   </script>
 </body>

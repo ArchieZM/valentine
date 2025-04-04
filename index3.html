@@ -1,217 +1,450 @@
-html<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Валентинка для Киры</title>
- <style>
- * {
- margin:0;
- padding:0;
- box-sizing: border-box;
- }
-
- body {
- width:100vw;
- height:100vh;
- overflow: hidden;
- background: linear-gradient(45deg, #ffe6f20%, #000000100%);
- display: flex;
- justify-content: center;
- align-items: center;
- font-family: Arial, sans-serif;
- }
-
- #container {
- position: relative;
- width:100%;
- height:100%;
- }
-
- .message {
- position: absolute;
- top:50%;
- left:50%;
- transform: translate(-50%, -50%);
- font-size:2.5em;
- color: white;
- text-shadow:0010px rgba(255,255,255,0.5);
- z-index:2;
- }
-
- .floating-heart {
- position: absolute;
- font-size:1.5em;
- color: #ff99cc;
- opacity:0.5;
- animation: float3s infinite linear;
- }
-
- .floating-word {
- position: absolute;
- font-size:1.2em;
- color: #ff99cc;
- opacity:0.5;
- animation: float3s infinite linear;
- }
-
- .continue-btn {
- position: absolute;
- top:70%;
- left:50%;
- transform: translateX(-50%);
- padding:15px30px;
- font-size:1.2em;
- background: #3498db;
- color: white;
- border: none;
- border-radius:25px;
- cursor: pointer;
- transition: all0.3s ease;
- }
-
- .continue-btn:hover {
- background: #2980b9;
- }
-
- #heart-canvas {
- position: absolute;
- width:100%;
- height:100%;
- }
-
- @keyframes float {
-0% { transform: translateY(0) rotate(0deg); }
-100% { transform: translateY(-100vh) rotate(360deg); }
- }
-
- .restart-btn {
- display: none;
- position: absolute;
- top:20px;
- right:20px;
- padding:10px20px;
- background: #3498db;
- color: white;
- border: none;
- border-radius:15px;
- cursor: pointer;
- }
- </style>
+  <meta charset="UTF-8">
+  <title>Для внука от Деда в трусах ✉️</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Marck+Script&display=swap');
+    
+    :root {
+      --dark: #0a0410;
+      --purple: #5a2b82;
+      --pink: #ff4d8d;
+      --accent: #d926ff;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--dark) 0%, #1e0a33 100%);
+      font-family: 'Playfair Display', serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: white;
+    }
+    
+    /* Конверт */
+    .envelope-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+      animation: envelopeDisappear 0.5s forwards 2.5s;
+    }
+    
+    .envelope {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      background: linear-gradient(145deg, #2a0a4a 0%, #4a1b6e 100%);
+      border-radius: 8px;
+      box-shadow: 
+        0 10px 30px rgba(89, 43, 130, 0.5),
+        inset 0 0 20px rgba(217, 38, 255, 0.2);
+      transform-style: preserve-3d;
+      animation: envelopeFloat 4s ease-in-out infinite;
+    }
+    
+    .envelope:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 90px solid #3a1258;
+      transform-origin: top;
+      z-index: 2;
+      filter: drop-shadow(0 -4px 4px rgba(0,0,0,0.3));
+      animation: envelopeFlapOpen 2.5s ease-in-out forwards;
+    }
+    
+    .envelope:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 12px;
+      background: linear-gradient(to right, 
+        transparent 0%, 
+        var(--accent) 50%, 
+        transparent 100%);
+      opacity: 0.3;
+    }
+    
+    .envelope-stamp {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 50px;
+      height: 60px;
+      background: linear-gradient(45deg, var(--pink) 0%, var(--accent) 100%);
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      transform: rotate(8deg);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 3;
+    }
+    
+    /* Открытка */
+    .card {
+      position: relative;
+      background: linear-gradient(to bottom, 
+        rgba(20, 5, 40, 0.95) 0%, 
+        rgba(40, 10, 70, 0.95) 100%);
+      width: 300px;
+      padding: 40px;
+      border-radius: 2px;
+      box-shadow: 
+        0 0 40px rgba(217, 38, 255, 0.3),
+        0 0 0 1px rgba(255,255,255,0.1);
+      transform: scale(0);
+      opacity: 0;
+      animation: cardAppear 1.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) forwards 3s;
+      border-left: 4px solid var(--pink);
+      z-index: 50;
+    }
+    
+    .card:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to right, 
+        transparent 0%, 
+        var(--pink) 30%, 
+        var(--accent) 70%, 
+        transparent 100%);
+    }
+    
+    .text {
+      font-size: 22px;
+      line-height: 1.5;
+      margin: 20px 0;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: textAppear 1s forwards var(--delay);
+      text-align: center;
+      font-weight: 400;
+    }
+    
+    .signature {
+      font-family: 'Marck Script', cursive;
+      font-size: 26px;
+      color: var(--pink);
+      margin-top: 30px;
+      text-align: right;
+      background: linear-gradient(to right, var(--pink), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .canvas-container {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      margin: 20px auto;
+      filter: drop-shadow(0 0 15px rgba(217, 38, 255, 0.4));
+    }
+    
+    #cherryCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Анимации */
+    @keyframes envelopeFloat {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    
+    @keyframes envelopeFlapOpen {
+      0% { transform: rotateX(0deg); }
+      40% { transform: rotateX(160deg); }
+      60% { transform: rotateX(160deg); }
+      80% { transform: rotateX(160deg) translateY(-30px); }
+      100% { transform: rotateX(160deg) translateY(-200px); opacity: 0; }
+    }
+    
+    @keyframes envelopeDisappear {
+      to { opacity: 0; display: none; }
+    }
+    
+    @keyframes cardAppear {
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes textAppear {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes cherryPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
- <div id="container">
- <div class="message">Я люблю тебя♥️</div>
- <canvas id="heart-canvas"></canvas>
- <button class="continue-btn">Продолжить</button>
- <button class="restart-btn">Начать сначала</button>
- </div>
+  <!-- Конверт -->
+  <div class="envelope-container">
+    <div class="envelope">
+      <div class="envelope-stamp">🍒</div>
+    </div>
+  </div>
+  
+  <!-- Открытка -->
+  <div class="card">
+    <p class="text" style="--delay: 3.5s">Дорогой внучок,</p>
+    
+    <div class="canvas-container">
+      <canvas id="cherryCanvas" width="240" height="240"></canvas>
+    </div>
+    
+    <p class="text" style="--delay: 4s">Прими эту вишенку как символ нашей особенной связи!</p>
+    <p class="text" style="--delay: 4.3s">Пусть в твоей жизни будет много сладких моментов.</p>
+    
+    <div class="signature" style="--delay: 4.6s">
+      С любовью,<br>
+      Дед в трусах 👴🩳
+    </div>
+  </div>
 
- <script>
- let animationStep =1;
- const canvas = document.getElementById('heart-canvas');
- const ctx = canvas.getContext('2d');
- // Настройки canvas function resizeCanvas() {
- canvas.width = window.innerWidth;
- canvas.height = window.innerHeight;
- }
- resizeCanvas();
- window.addEventListener('resize', resizeCanvas);
+  <script>
+    // Инициализация элементов
+    const cherryCanvas = document.getElementById('cherryCanvas');
+    const cherryCtx = cherryCanvas.getContext('2d');
+    const centerX = cherryCanvas.width / 2;
+    const centerY = cherryCanvas.height / 2;
 
- // Создание плавающих сердечек и слов function createFloatingElements() {
- const elements = [
- '♥', '❤', '★', 'Любовь', 'Счастье', 'Ты — моя звезда', 'Вечная связь'
- ];
- setInterval(() => {
- const element = elements[Math.floor(Math.random() * elements.length)];
- const x = Math.random() * window.innerWidth;
- const y = Math.random() * window.innerHeight;
- const elem = document.createElement('div');
- elem.className = `floating-${Math.random() >0.5 ? 'heart' : 'word'}`;
- elem.textContent = element;
- elem.style.left = x + 'px';
- elem.style.top = y + 'px';
- document.body.appendChild(elem);
- setTimeout(() => {
- elem.remove();
- },3000);
- },1000);
- }
- createFloatingElements();
+    // Параметры вишенки
+    const cherry = {
+      x: centerX,
+      y: centerY + 20,
+      radius: 40, // Размер ягод
+      stemLength: 70,
+      stemCurve: 40,
+      leafSize: 45
+    };
 
- // Обработка кнопки "Продолжить"
- document.querySelector('.continue-btn').addEventListener('click', () => {
- // Удаление текущих элементов document.querySelectorAll('.floating-heart, .floating-word').forEach(el => el.remove());
- // Анимация кнопки document.querySelector('.continue-btn').style.animation = 'btnUp0.5s ease';
- setTimeout(() => {
- document.querySelector('.continue-btn').style.display = 'none';
- },500);
- // Переход к следующему этапу setTimeout(startTransition,500);
- });
+    // Точки для контура вишенки (две ягоды, стебель, лист)
+    const pointsLeft = [];
+    const pointsRight = [];
+    const stemPoints = [];
+    const leafPoints = [];
+    const numPoints = 50;
+    const stemSteps = 20;
+    const leafSteps = 20;
 
- // Этап2: Переход function startTransition() {
- document.body.style.transition = 'all1s ease';
- document.body.style.background = '#000000';
- setTimeout(() => {
- document.body.style.background = '#000000';
- startHeartFormation();
- },1000);
- }
+    // Контур левой ягоды
+    for (let i = 0; i < numPoints; i++) {
+      const angle = (Math.PI * 2 * i) / numPoints;
+      pointsLeft.push([
+        cherry.x - cherry.radius / 2 + Math.cos(angle) * cherry.radius,
+        cherry.y + Math.sin(angle) * cherry.radius
+      ]);
+    }
 
- // Этап3: Формирование сердца function startHeartFormation() {
- // Очистка canvas ctx.clearRect(0,0, canvas.width, canvas.height);
- // Рисование нитей const centerX = canvas.width /2;
- const centerY = canvas.height /2;
- const radius =100;
- // Параметры нитей const numberOfStrings =8;
- const angleStep = (Math.PI *2) / numberOfStrings;
- for (let i =0; i < numberOfStrings; i++) {
- const angle = i * angleStep;
- const x = centerX + Math.cos(angle) * radius;
- const y = centerY + Math.sin(angle) * radius;
- drawLineWithAnimation(x, y, centerX, centerY, i *100);
- }
- }
+    // Контур правой ягоды
+    for (let i = 0; i < numPoints; i++) {
+      const angle = (Math.PI * 2 * i) / numPoints;
+      pointsRight.push([
+        cherry.x + cherry.radius / 2 + Math.cos(angle) * cherry.radius,
+        cherry.y + Math.sin(angle) * cherry.radius
+      ]);
+    }
 
- function drawLineWithAnimation(x1, y1, x2, y2, delay) {
- setTimeout(() => {
- ctx.beginPath();
- ctx.moveTo(x1, y1);
- ctx.lineTo(x2, y2);
- ctx.strokeStyle = '#ff99cc';
- ctx.lineWidth =2;
- ctx.stroke();
- }, delay);
- }
+    // Точки для стебля
+    for (let i = 0; i <= stemSteps; i++) {
+      const t = i / stemSteps;
+      const x = cherry.x + (cherry.x - cherry.stemCurve - cherry.x) * t;
+      const y = (cherry.y - cherry.radius) + (cherry.y - cherry.radius - cherry.stemLength - (cherry.y - cherry.radius)) * t;
+      stemPoints.push([x, y]);
+    }
 
- // Этап4: Биение сердца function startHeartBeating() {
- const heart = new Path2D();
- heart.arc(canvas.width /2, canvas.height /2,100,0, Math.PI *2);
- ctx.beginPath();
- ctx.fillStyle = '#ff99cc';
- ctx.fill(heart);
- let scale =1;
- setInterval(() => {
- ctx.clearRect(0,0, canvas.width, canvas.height);
- ctx.beginPath();
- ctx.translate(canvas.width /2, canvas.height /2);
- ctx.scale(scale, scale);
- ctx.translate(-canvas.width /2, -canvas.height /2);
- ctx.fill(heart);
- ctx.resetTransform();
- scale = scale ===1.2 ?1 :1.2;
- },500);
- }
+    // Точки для листа
+    for (let i = 0; i <= leafSteps; i++) {
+      const angle = (Math.PI * 2 * i) / leafSteps;
+      leafPoints.push([
+        cherry.x - 15 + Math.cos(angle) * cherry.leafSize,
+        cherry.y - cherry.radius - cherry.stemLength / 2 + 5 + Math.sin(angle) * (cherry.leafSize / 2)
+      ]);
+    }
 
- // Обработка кнопки "Начать сначала"
- document.querySelector('.restart-btn').addEventListener('click', () => {
- window.location.reload();
- });
+    // Объединяем все точки в одну линию
+    const allPoints = [
+      ...pointsLeft, // Левая ягода
+      ...pointsRight, // Правая ягода
+      ...stemPoints, // Стебель
+      ...leafPoints // Лист
+    ];
 
- // Показ кнопки "Начать сначала"
- setTimeout(() => {
- document.querySelector('.restart-btn').style.display = 'block';
- },5000);
- </script>
+    let drawProgress = 0;
+    const drawSpeed = 0.005; // Скорость рисования линии
+    let totalPoints = allPoints.length;
+
+    // Рисование вишенки
+    function drawCherry() {
+      cherryCtx.clearRect(0, 0, cherryCanvas.width, cherryCanvas.height);
+
+      // Рисуем линию по контуру
+      cherryCtx.beginPath();
+      const pointsToDraw = Math.floor(totalPoints * drawProgress);
+      for (let i = 0; i < pointsToDraw && i < totalPoints; i++) {
+        if (i === 0) cherryCtx.moveTo(allPoints[i][0], allPoints[i][1]);
+        else cherryCtx.lineTo(allPoints[i][0], allPoints[i][1]);
+      }
+
+      // Определяем текущий цвет в зависимости от участка
+      if (drawProgress < 0.33) {
+        cherryCtx.strokeStyle = "#ff2d6d"; // Цвет ягод
+      } else if (drawProgress < 0.66) {
+        cherryCtx.strokeStyle = "#ff2d6d"; // Цвет ягод
+      } else if (drawProgress < 0.9) {
+        cherryCtx.strokeStyle = "#4a8f2a"; // Цвет стебля
+      } else {
+        cherryCtx.strokeStyle = "#4a8f2a"; // Цвет листа
+      }
+      cherryCtx.lineWidth = 2;
+      cherryCtx.stroke();
+
+      // Заполняем ягоды, стебель и лист после завершения контура
+      if (drawProgress >= 1) {
+        // Левая ягода
+        cherryCtx.beginPath();
+        for (let i = 0; i < pointsLeft.length; i++) {
+          if (i === 0) cherryCtx.moveTo(pointsLeft[i][0], pointsLeft[i][1]);
+          else cherryCtx.lineTo(pointsLeft[i][0], pointsLeft[i][1]);
+        }
+        cherryCtx.closePath();
+        const gradientLeft = cherryCtx.createRadialGradient(
+          cherry.x - cherry.radius / 2, cherry.y - 10, 10,
+          cherry.x - cherry.radius / 2, cherry.y, cherry.radius
+        );
+        gradientLeft.addColorStop(0, "#ff2d6d");
+        gradientLeft.addColorStop(1, "#a00034");
+        cherryCtx.fillStyle = gradientLeft;
+        cherryCtx.fill();
+
+        // Правая ягода
+        cherryCtx.beginPath();
+        for (let i = 0; i < pointsRight.length; i++) {
+          if (i === 0) cherryCtx.moveTo(pointsRight[i][0], pointsRight[i][1]);
+          else cherryCtx.lineTo(pointsRight[i][0], pointsRight[i][1]);
+        }
+        cherryCtx.closePath();
+        const gradientRight = cherryCtx.createRadialGradient(
+          cherry.x + cherry.radius / 2, cherry.y - 10, 10,
+          cherry.x + cherry.radius / 2, cherry.y, cherry.radius
+        );
+        gradientRight.addColorStop(0, "#ff2d6d");
+        gradientRight.addColorStop(1, "#a00034");
+        cherryCtx.fillStyle = gradientRight;
+        cherryCtx.fill();
+
+        // Стебель
+        cherryCtx.beginPath();
+        for (let i = 0; i < stemPoints.length; i++) {
+          if (i === 0) cherryCtx.moveTo(stemPoints[i][0], stemPoints[i][1]);
+          else cherryCtx.lineTo(stemPoints[i][0], stemPoints[i][1]);
+        }
+        cherryCtx.strokeStyle = "#4a8f2a";
+        cherryCtx.lineWidth = 5;
+        cherryCtx.stroke();
+
+        // Лист
+        cherryCtx.beginPath();
+        for (let i = 0; i < leafPoints.length; i++) {
+          if (i === 0) cherryCtx.moveTo(leafPoints[i][0], leafPoints[i][1]);
+          else cherryCtx.lineTo(leafPoints[i][0], leafPoints[i][1]);
+        }
+        cherryCtx.closePath();
+        const leafGradient = cherryCtx.createLinearGradient(
+          cherry.x - 30, cherry.y - cherry.radius - cherry.stemLength / 2,
+          cherry.x + 15, cherry.y - cherry.radius - cherry.stemLength / 2 + 30
+        );
+        leafGradient.addColorStop(0, "#7cba4a");
+        leafGradient.addColorStop(1, "#4a8f2a");
+        cherryCtx.fillStyle = leafGradient;
+        cherryCtx.fill();
+
+        // Блеск на ягодах
+        cherryCtx.fillStyle = "rgba(255,255,255,0.3)";
+        cherryCtx.beginPath();
+        cherryCtx.arc(
+          cherry.x - cherry.radius / 2 + cherry.radius / 3,
+          cherry.y - cherry.radius / 3,
+          cherry.radius / 6,
+          0, Math.PI * 2
+        );
+        cherryCtx.fill();
+        cherryCtx.beginPath();
+        cherryCtx.arc(
+          cherry.x + cherry.radius / 2 + cherry.radius / 3,
+          cherry.y - cherry.radius / 3,
+          cherry.radius / 6,
+          0, Math.PI * 2
+        );
+        cherryCtx.fill();
+      }
+    }
+
+    // Анимация рисования
+    function animateDraw() {
+      drawProgress = Math.min(drawProgress + drawSpeed, 1);
+      drawCherry();
+
+      if (drawProgress < 1) {
+        requestAnimationFrame(animateDraw);
+      } else {
+        startCherryPulse();
+      }
+    }
+
+    // Пульсация вишенки
+    function startCherryPulse() {
+      cherryCanvas.style.animation = "cherryPulse 1.5s infinite ease-in-out";
+
+      // Добавляем свечение
+      function pulseGlow() {
+        const scale = parseFloat(getComputedStyle(cherryCanvas).transform.split(',')[3] || 1);
+        const glowIntensity = (scale - 1) * 30;
+        cherryCanvas.style.filter = `drop-shadow(0 0 ${glowIntensity}px rgba(217, 38, 255, 0.5))`;
+        requestAnimationFrame(pulseGlow);
+      }
+
+      pulseGlow();
+    }
+
+    // Инициализация
+    function init() {
+      setTimeout(() => {
+        animateDraw();
+      }, 1000);
+    }
+
+    window.addEventListener('load', init);
+  </script>
 </body>
 </html>

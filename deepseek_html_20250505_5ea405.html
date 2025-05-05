@@ -1,0 +1,139 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Networks - Correct Logos Background</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-bg {
+    position: relative;
+    overflow: hidden;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .btn-bg:hover {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+    z-index: 10;
+  }
+  .btn-bg img.bg-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    opacity: 0.25; /* Увеличил прозрачность */
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.7));
+    transition: opacity 0.3s ease;
+  }
+  .btn-bg:hover img.bg-logo {
+    opacity: 0.4; /* Увеличил прозрачность при наведении */
+  }
+  .btn-bg .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    border-radius: inherit;
+    pointer-events: none;
+    transition: background 0.3s ease;
+  }
+  .btn-bg:hover .overlay {
+    background: rgba(0,0,0,0.15);
+  }
+  .btn-text {
+    position: relative;
+    z-index: 20;
+    font-weight: 800;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+    user-select: none;
+  }
+  .btn-text-lg {
+    font-size: 1.875rem;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen flex items-center justify-center">
+  <div class="container grid grid-cols-1 sm:grid-cols-2 gap-8">
+
+    <!-- ChatGPT -->
+    <a href="http://t.me/miniappGPTbot/chatgpt" target="_blank" class="btn-bg bg-white border-black p-8 flex items-center justify-center relative">
+      <img alt="ChatGPT logo" class="bg-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-black btn-text-lg">ChatGPT</span>
+    </a>
+
+    <!-- Grok -->
+    <a href="http://t.me/miniappGPTbot/Grok" target="_blank" class="btn-bg border-white bg-gradient-to-tr from-[#0b0c1a] via-[#1a1a2e] to-[#0b0c1a] p-8 flex items-center justify-center relative">
+      <img alt="Grok logo" class="bg-logo" src="https://grok.x.ai/static/logo-344c23a4c4d1c0613d26.png">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">Grok</span>
+    </a>
+
+    <!-- DeepSeek -->
+    <a href="http://t.me/miniappGPTbot/deepseek" target="_blank" class="btn-bg border-[#005f9e] bg-white p-8 flex items-center justify-center relative">
+      <img alt="DeepSeek logo" class="bg-logo" src="https://www.deepseek.com/static/img/logo_black.65d132f.png">
+      <div class="overlay rounded-xl" style="background: rgba(255,255,255,0.6);"></div>
+      <span class="btn-text text-[#005f9e] btn-text-lg">DeepSeek</span>
+    </a>
+
+    <!-- Gemini -->
+    <a href="http://t.me/miniappGPTbot/gemini" target="_blank" class="btn-bg border-[#1e40af] bg-[#1e40af] p-8 flex items-center justify-center relative">
+      <img alt="Gemini logo" class="bg-logo" src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">Gemini</span>
+    </a>
+
+    <!-- Qwen -->
+    <a href="http://t.me/miniappGPTbot/qwen" target="_blank" class="btn-bg border-[#00c6ff] bg-gradient-to-tr from-[#00c6ff] to-[#0072ff] p-8 flex items-center justify-center relative">
+      <img alt="Qwen logo" class="bg-logo" src="https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen_LOGO_COLOR.png">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">Qwen</span>
+    </a>
+
+    <!-- Perplexity -->
+    <a href="http://t.me/miniappGPTbot/Perplexity" target="_blank" class="btn-bg border-black bg-gradient-to-tr from-black via-gray-800 to-black p-8 flex items-center justify-center relative">
+      <img alt="Perplexity logo" class="bg-logo" src="https://perplexity.ai/favicon.ico">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">Perplexity</span>
+    </a>
+
+    <!-- Copilot -->
+    <a href="http://t.me/miniappGPTbot/copilot" target="_blank" class="btn-bg border-[#0078d7] bg-gradient-to-tr from-[#00a4ef] via-[#7fba00] to-[#f25022] p-8 flex items-center justify-center relative">
+      <img alt="Copilot logo" class="bg-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">Copilot</span>
+    </a>
+
+    <!-- Claude -->
+    <a href="http://t.me/miniappGPTbot/claude" target="_blank" class="btn-bg border-[#6f42c1] bg-gradient-to-tr from-[#a78bfa] to-[#5b21b6] p-8 flex items-center justify-center relative sm:col-span-2">
+      <img alt="Claude logo" class="bg-logo" src="https://cdn.anthropic.com/anthropic-logo.png">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">Claude</span>
+    </a>
+
+    <!-- YouGPT -->
+    <a href="http://t.me/miniappGPTbot/yougpt" target="_blank" class="btn-bg border-[#ff416c] bg-gradient-to-tr from-[#ff416c] to-[#ff4b2b] p-8 flex items-center justify-center relative sm:col-span-2">
+      <img alt="YouGPT logo" class="bg-logo" src="https://you.com/static/images/logo_flat.png">
+      <div class="overlay rounded-xl"></div>
+      <span class="btn-text text-white btn-text-lg">YouGPT</span>
+    </a>
+
+  </div>
+</body>
+</html>
